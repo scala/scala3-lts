@@ -83,7 +83,39 @@ object Build {
 
   val referenceVersion = "3.3.5"
 
-  val baseVersion = "3.3.6-RC1"
+  /** Version of the Scala compiler targeted in the current release cycle
+   *  Contains a version without RC/SNAPSHOT/NIGHTLY specific suffixes
+   *  Should be updated ONLY after release or cutoff for previous release cycle.
+   *
+   *  Should only be referred from `dottyVersion` or settings/tasks requiring simplified version string,
+   *  eg. `compatMode` or Windows native distribution version.
+   */
+  val developedVersion = "3.3.6"
+
+  /** The version of the compiler including the RC prefix.
+   *  Defined as common base before calculating environment specific suffixes in `dottyVersion`
+   *
+   *  By default, during development cycle defined as `${developedVersion}-RC1`;
+   *  During release candidate cycle incremented by the release officer before publishing a subsequent RC version;
+   *  During final, stable release is set exactly to `developedVersion`.
+  */
+  val baseVersion = s"$developedVersion-RC1"
+
+  /** Final version of Scala compiler, controlled by environment variables. */
+  val dottyVersion = {
+    if (isRelease) baseVersion
+    else if (isNightly) s"${baseVersion}-bin-${VersionUtil.commitDate}-${VersionUtil.gitHash}-NIGHTLY"
+    else s"${baseVersion}-bin-SNAPSHOT"
+  }
+  def isRelease = sys.env.get("RELEASEBUILD").contains("yes")
+  def isNightly = sys.env.get("NIGHTLYBUILD").contains("yes")
+
+  /** Version calculate for `nonbootstrapped` projects */
+  val dottyNonBootstrappedVersion = {
+    // Make sure sbt always computes the scalaBinaryVersion correctly
+    val bin = if (!dottyVersion.contains("-bin")) "-bin" else ""
+    dottyVersion + bin + "-nonbootstrapped"
+  }
 
   // LTS or Next
   val versionLine = "LTS"
@@ -110,8 +142,8 @@ object Build {
   }
 
   val compatMode = {
-    val VersionRE = """^\d+\.(\d+).(\d+).*""".r
-    baseVersion match {
+    val VersionRE = """^\d+\.(\d+)\.(\d+)""".r
+    developedVersion match {
       case VersionRE(_, "0")   => CompatMode.BinaryCompatible
       case _                   => CompatMode.SourceAndBinaryCompatible
     }
@@ -131,24 +163,6 @@ object Build {
   val dottyOrganization = "org.scala-lang"
   val dottyGithubUrl = "https://github.com/scala/scala3"
   val dottyGithubRawUserContentUrl = "https://raw.githubusercontent.com/scala/scala3"
-
-
-  val isRelease = sys.env.get("RELEASEBUILD") == Some("yes")
-
-  val dottyVersion = {
-    def isNightly = sys.env.get("NIGHTLYBUILD") == Some("yes")
-    if (isRelease)
-      baseVersion
-    else if (isNightly)
-      baseVersion + "-bin-" + VersionUtil.commitDate + "-" + VersionUtil.gitHash + "-NIGHTLY"
-    else
-      baseVersion + "-bin-SNAPSHOT"
-  }
-  val dottyNonBootstrappedVersion = {
-    // Make sure sbt always computes the scalaBinaryVersion correctly
-    val bin = if (!dottyVersion.contains("-bin")) "-bin" else ""
-    dottyVersion + bin + "-nonbootstrapped"
-  }
 
   val sbtCommunityBuildVersion = "0.1.0-SNAPSHOT"
 
