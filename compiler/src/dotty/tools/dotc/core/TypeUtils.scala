@@ -3,7 +3,10 @@ package dotc
 package core
 
 import TypeErasure.ErasedValueType
-import Types.*, Contexts.*, Symbols.*, Flags.*, Decorators.*
+import Types.*, Contexts.*, Symbols.*, Flags.*, Decorators.*, SymDenotations.*
+import Names.{Name, TermName}
+import Constants.Constant
+
 import Names.Name
 import StdNames.nme
 
@@ -126,6 +129,37 @@ class TypeUtils:
     def takesImplicitParams(using Context): Boolean = self.stripPoly match
       case mt: MethodType => mt.isImplicitMethod || mt.resType.takesImplicitParams
       case _ => false
+
+
+    /** If `self` is of the form `p.x` where `p` refers to a package
+     *  but `x` is not owned by a package, expand it to
+     *
+     *      p.package.x
+     */
+    def makePackageObjPrefixExplicit(using Context): Type =
+      def tryInsert(tpe: NamedType, pkgClass: SymDenotation): Type = pkgClass match
+        case pkg: PackageClassDenotation =>
+          var sym = tpe.symbol
+          if !sym.exists && tpe.denot.isOverloaded then
+            // we know that all alternatives must come from the same package object, since
+            // otherwise we would get "is already defined" errors. So we can take the first
+            // symbol we see.
+            sym = tpe.denot.alternatives.head.symbol
+          val pobj = pkg.packageObjFor(sym)
+          if pobj.exists then tpe.derivedSelect(pobj.termRef)
+          else tpe
+        case _ =>
+          tpe
+      self match
+      case tpe: NamedType =>
+        if tpe.symbol.isRoot then
+          tpe
+        else
+          tpe.prefix match
+            case pre: ThisType if pre.cls.is(Package) => tryInsert(tpe, pre.cls)
+            case pre: TermRef if pre.symbol.is(Package) => tryInsert(tpe, pre.symbol.moduleClass)
+            case _ => tpe
+      case tpe => tpe
 
     /** The constructors of this type that are applicable to `argTypes`, without needing
      *  an implicit conversion. Curried constructors are always excluded.
