@@ -46,7 +46,7 @@ env:
 
 jobs:
   test_non_bootstrapped:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -98,7 +98,7 @@ jobs:
           ./project/scripts/cmdTests
 
   test:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -152,7 +152,7 @@ jobs:
 
 
   test_windows_fast:
-    runs-on: [self-hosted, Windows]
+    runs-on: windows-2022
     if: "(
            github.event_name == 'push'
            && github.ref != 'refs/heads/main'
@@ -199,7 +199,7 @@ jobs:
         shell: cmd
 
   test_windows_full:
-    runs-on: [self-hosted, Windows]
+    runs-on: windows-2022
     if: "github.event_name == 'schedule' && github.repository == 'scala/scala3'
          || github.event_name == 'push'
          || (
@@ -228,7 +228,7 @@ jobs:
 
   mima:
     name: MiMa
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -274,7 +274,7 @@ jobs:
           ./project/scripts/sbt ";scala3-interfaces/mimaReportBinaryIssues ;scala3-library-bootstrapped/mimaReportBinaryIssues ;scala3-library-bootstrappedJS/mimaReportBinaryIssues; tasty-core-bootstrapped/mimaReportBinaryIssues"
 
   community_build_a:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -328,7 +328,7 @@ jobs:
         run: cat community-build/dotty-community-build-deps || true
 
   community_build_b:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -382,7 +382,7 @@ jobs:
         run: cat community-build/dotty-community-build-deps || true
 
   community_build_c:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -436,7 +436,7 @@ jobs:
         run: cat community-build/dotty-community-build-deps || true
 
   test_sbt:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -481,7 +481,7 @@ jobs:
         run: ./project/scripts/sbt "sbt-test/scripted; sbt-community-build/scripted"
 
   test_java8:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -537,7 +537,7 @@ jobs:
           ./project/scripts/sbt ";sjsSandbox/run ;sjsSandbox/test ;sjsJUnitTests/test ;set sjsJUnitTests/scalaJSLinkerConfig ~= switchToESModules ;sjsJUnitTests/test ;sjsCompilerTests/test"
 
   publish_nightly:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -600,7 +600,7 @@ jobs:
           ./project/scripts/sbtPublish ";project scala3-bootstrapped ;publishSigned ;sonatypeBundleRelease"
 
   nightly_documentation:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -654,7 +654,7 @@ jobs:
   publish_release:
     permissions:
       contents: write  # for actions/create-release to create a release
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
       options: --cpu-shares 4096
@@ -756,7 +756,7 @@ jobs:
 
 
   open_issue_on_failure:
-    runs-on: [self-hosted, Linux]
+    runs-on: ubuntu-24.04
     container:
       image: lampepfl/dotty:2024-10-18
     needs: [nightly_documentation, test_windows_full]
