@@ -168,6 +168,7 @@ jobs:
       - name: Reset existing repo
         shell: cmd
         run: |
+          git config --global core.autocrlf input
           git config --global --add safe.directory /__w/scala3-lts/scala3-lts
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3-lts" && git reset --hard FETCH_HEAD || true
 
@@ -182,8 +183,9 @@ jobs:
         run: sbt "dist/pack" & bash -version
         shell: cmd
 
+      - uses: cygwin/cygwin-install-action@master
       - name: cygwin tests
-        run: '"C:\Program Files\cygwin64\bin\bash" ./project/scripts/winCmdTests'
+        run: '"C:\cygwin\bin\bash" ./project/scripts/winCmdTests'
         shell: cmd
 
       - name: msys tests
