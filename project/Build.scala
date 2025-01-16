@@ -589,6 +589,13 @@ object Build {
 
   // Settings shared between scala3-compiler and scala3-compiler-bootstrapped
   lazy val commonDottyCompilerSettings = Seq(
+      /* Ignore a deprecation warning about AnyRefMap in scalajs-ir. The latter
+       * cross-compiles for 2.12, and therefore AnyRefMap remains useful there
+       * for performance reasons.
+       * The build of Scala.js core does the same thing.
+       */
+      scalacOptions += "-Wconf:cat=deprecation&origin=scala\\.collection\\.mutable\\.AnyRefMap.*:s",
+
       // Generate compiler.properties, used by sbt
       (Compile / resourceGenerators) += Def.task {
         import java.util._
