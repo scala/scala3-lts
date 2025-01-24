@@ -525,7 +525,7 @@ object CheckUnused:
     def checkPrivate(sym: Symbol, pos: SrcPos) =
       if ctx.settings.WunusedHas.privates
         && !sym.isPrimaryConstructor
-        && sym.is(Private, butNot = SelfName | Synthetic | CaseAccessor)
+        && !sym.isOneOf(SelfName | Synthetic | CaseAccessor)
         && !sym.name.is(BodyRetainerName)
         && !sym.isSerializationSupport
         && !(sym.is(Mutable) && sym.isSetter && sym.owner.is(Trait)) // tracks sym.underlyingSymbol sibling getter
