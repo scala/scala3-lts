@@ -514,7 +514,7 @@ object Implicits:
     override def toString = s"TooUnspecific"
 
   /** An ambiguous implicits failure */
-  class AmbiguousImplicits(val alt1: SearchSuccess, val alt2: SearchSuccess, val expectedType: Type, val argument: Tree, val nested: Boolean = false) extends SearchFailureType {
+  class AmbiguousImplicits(val alt1: SearchSuccess, val alt2: SearchSuccess, val expectedType: Type, val argument: Tree, val nested: Boolean = false) extends SearchFailureType:
 
     def msg(using Context): Message =
       var str1 = err.refStr(alt1.ref)
@@ -531,7 +531,10 @@ object Implicits:
         i"""
            |Note that implicit $what cannot be applied because they are ambiguous;
            |$explanation"""
-  }
+
+    def asNested = if nested then this else AmbiguousImplicits(alt1, alt2, expectedType, argument, nested = true)
+
+  end AmbiguousImplicits
 
   class MismatchedImplicit(ref: TermRef,
                            val expectedType: Type,
