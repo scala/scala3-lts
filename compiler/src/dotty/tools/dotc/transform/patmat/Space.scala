@@ -113,6 +113,7 @@ object SpaceEngine {
   def isSubspace(a: Space, b: Space)(using Context): Boolean = a.isSubspace(b)
   def canDecompose(typ: Typ)(using Context): Boolean         = typ.canDecompose
   def decompose(typ: Typ)(using Context): List[Typ]          = typ.decompose
+  def nullSpace(using Context): Space = Typ(ConstantType(Constant(null)), decomposed = false)
 
   /** Simplify space such that a space equal to `Empty` becomes `Empty` */
   def computeSimplify(space: Space)(using Context): Space = trace(i"simplify($space)")(space match {
@@ -690,7 +691,6 @@ object SpaceEngine {
           else NoType
         }.filter(_.exists)
         parts
-
       case _ => ListOfNoType
     end rec
 
@@ -904,6 +904,10 @@ object SpaceEngine {
       then project(OrType(selTyp, ConstantType(Constant(null)), soft = false))
       else project(selTyp)
     )
+    def projectPat(pat: Tree): Space =
+      // Project toplevel wildcard pattern to nullable
+      if isNullable && isWildcardArg(pat) then Or(project(pat) :: nullSpace :: Nil)
+      else project(pat)
 
     var i        = 0
     val len      = cases.length
@@ -913,7 +917,7 @@ object SpaceEngine {
     while (i < len) {
       val CaseDef(pat, guard, _) = cases(i)
 
-      val curr = trace(i"project($pat)")(project(pat))
+      val curr = trace(i"project($pat)")(projectPat(pat))
 
       val covered = trace("covered")(simplify(intersect(curr, targetSpace)))
 
