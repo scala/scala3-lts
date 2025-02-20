@@ -46,7 +46,7 @@ object ScaladocInternalTastyInspector:
   private def checkFiles(tastyFiles: List[String], jars: List[String]): Unit =
     def checkFile(fileName: String, ext: String): Unit =
       val file = dotty.tools.io.Path(fileName)
-      if !file.ext.toLowerCase.equalsIgnoreCase(ext) then
+      if !file.extension.toLowerCase.equalsIgnoreCase(ext) then
         throw new IllegalArgumentException(s"File extension is not `.$ext`: $file")
       else if !file.exists then
         throw new IllegalArgumentException(s"File not found: ${file.toAbsolute}")
