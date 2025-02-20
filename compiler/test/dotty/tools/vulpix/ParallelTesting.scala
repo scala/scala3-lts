@@ -61,6 +61,8 @@ trait ParallelTesting extends RunnerOrchestration { self =>
   /** Contains a list of failed tests to run, if list is empty no tests will run */
   def failedTests: Option[List[String]]
 
+  protected def testPlatform: TestPlatform = TestPlatform.JVM
+
   /** A test source whose files or directory of files is to be compiled
    *  in a specific way defined by the `Test`
    */
