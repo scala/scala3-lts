@@ -131,6 +131,7 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
     refInfos.inlined.push(tree.call.srcPos)
     ctx
   override def transformInlined(tree: Inlined)(using Context): tree.type =
+    //transformAllDeep(tree.expansion) // traverse expansion with nonempty inlined stack to avoid registering defs
     val _ = refInfos.inlined.pop()
     if !tree.call.isEmpty && phaseMode.eq(PhaseMode.Aggregate) then
       transformAllDeep(tree.call)
