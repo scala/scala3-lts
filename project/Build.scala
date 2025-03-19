@@ -127,14 +127,13 @@ object Build {
   val publishedDottyVersion = referenceVersion
   val sbtDottyVersion = "0.5.5"
 
-  /** Version against which we check binary compatibility.
+  /** LTS version against which we check binary compatibility.
    *
-   *  This must be the latest published release in the same versioning line.
-   *  For example, if the next version is going to be 3.1.4, then this must be
-   *  set to 3.1.3. If it is going to be 3.1.0, it must be set to the latest
-   *  3.0.x release.
+   *  This must be the earliest published release in the LTS versioning line.
+   *  For example, if the latest LTS release is be 3.3.4, then this must be
+   *  set to 3.3.0.
    */
-  val previousDottyVersion = "3.3.5"
+  val mimaPreviousLTSDottyVersion = "3.3.0"
 
   object CompatMode {
     final val BinaryCompatible = 0
@@ -491,7 +490,7 @@ object Build {
         case cv: Disabled => thisProjectID.name
         case cv: Binary => s"${thisProjectID.name}_${cv.prefix}3${cv.suffix}"
       }
-      (thisProjectID.organization % crossedName % previousDottyVersion)
+      (thisProjectID.organization % crossedName % mimaPreviousLTSDottyVersion)
     },
 
     mimaCheckDirection := (compatMode match {
