@@ -146,7 +146,7 @@ object Build {
   }
 
   // LTS or Next
-  val versionLine = "LTS"
+  final val versionLine = "LTS"
 
   // Versions used by the vscode extension to create a new project
   // This should be the latest published releases.
@@ -2119,9 +2119,10 @@ object Build {
       case Array("28", minor, "experimental", _) => (minor.toInt, true)
       case other => sys.error(s"Invalid TASTy version string: $expectedTastyVersion")
     }
+    val isLTS = versionLine == "LTS"
 
     if(isNightly) {
-      assert(tastyIsExperimental, "TASTY needs to be experimental in nightly builds")
+      assert(tastyIsExperimental || isLTS, "TASTY needs to be experimental in nightly builds")
       val expectedTastyMinor = version.patch match {
         case 0 => version.minor
         case 1 if referenceV.patch == 0 && referenceV.isRC =>
@@ -2129,9 +2130,11 @@ object Build {
           // Needed for non_bootstrapped tests requiring either stable tasty or the same experimental version produced by both reference and bootstrapped compiler
           assert(version.minor == referenceV.minor, "Expected reference and base version to use the same minor")
           version.minor
-        case _ => version.minor + 1
+        case _ =>
+          if (isLTS) version.minor
+          else version.minor + 1
       }
-      assert(tastyMinor == expectedTastyMinor, "Invalid TASTy minor version")
+      assert(tastyMinor == expectedTastyMinor, s"Invalid TASTy minor version, expected $expectedTastyMinor, got $tastyMinor")
     }
 
     if(isRelease) {
