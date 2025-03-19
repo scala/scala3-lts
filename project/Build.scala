@@ -85,6 +85,8 @@ object Build {
    *  Reference version should track the latest version pushed to Maven:
    *  - In main branch it should be the last RC version
    *  - In release branch it should be the last stable release
+   *
+   *  Warning: Change of this variable needs to be consulted with `expectedTastyVersion`
    */
   val referenceVersion = "3.3.5"
 
@@ -94,6 +96,8 @@ object Build {
    *
    *  Should only be referred from `dottyVersion` or settings/tasks requiring simplified version string,
    *  eg. `compatMode` or Windows native distribution version.
+   *
+   *  Warning: Change of this variable might require updating `expectedTastyVersion`
    */
   val developedVersion = "3.3.6"
 
@@ -105,6 +109,25 @@ object Build {
    *  During final, stable release is set exactly to `developedVersion`.
   */
   val baseVersion = s"$developedVersion-RC1"
+
+  /** The version of TASTY that should be emitted, checked in runtime test
+   *  For defails on how TASTY version should be set see related discussions:
+   *    - https://github.com/scala/scala3/issues/13447#issuecomment-912447107
+   *    - https://github.com/scala/scala3/issues/14306#issuecomment-1069333516
+   *    - https://github.com/scala/scala3/pull/19321
+   *
+   *  Simplified rules, given 3.$minor.$patch = $developedVersion
+   *    - Major version is always 28
+   *    - TASTY minor version:
+   *      - in main (NIGHTLY): {if $patch == 0 || ${referenceVersion.matches(raw"3.$minor.0-RC\d")} then $minor else ${minor + 1}}
+   *      - in release branch is always equal to $minor
+   *    - TASTY experimental version:
+   *      - in main (NIGHTLY) is always experimental
+   *      - in release candidate branch is experimental if {patch == 0}
+   *      - in stable release is always non-experimetnal
+   */
+  val expectedTastyVersion = "28.3"
+  checkReleasedTastyVersion()
 
   /** Final version of Scala compiler, controlled by environment variables. */
   val dottyVersion = {
@@ -2043,6 +2066,9 @@ object Build {
       settings(disableDocSetting).
       settings(
         versionScheme := Some("semver-spec"),
+        Test / envVars ++= Map(
+          "EXPECTED_TASTY_VERSION" -> expectedTastyVersion,
+        ),
         if (mode == Bootstrapped) Def.settings(
           commonMiMaSettings,
           mimaBinaryIssueFilters ++= MiMaFilters.TastyCore,
@@ -2076,6 +2102,46 @@ object Build {
       case NonBootstrapped => commonNonBootstrappedSettings
       case Bootstrapped => commonBootstrappedSettings
     })
+  }
+
+  /* Tests TASTy version invariants during NIGHLY, RC or Stable releases */
+  def checkReleasedTastyVersion(): Unit = {
+    case class ScalaVersion(minor: Int, patch: Int, isRC: Boolean)
+    def parseScalaVersion(version: String): ScalaVersion = version.split("\\.|-").take(4) match {
+      case Array("3", minor, patch)    => ScalaVersion(minor.toInt, patch.toInt, false)
+      case Array("3", minor, patch, _) => ScalaVersion(minor.toInt, patch.toInt, true)
+      case other => sys.error(s"Invalid Scala base version string: $baseVersion")
+    }
+    lazy val version = parseScalaVersion(baseVersion)
+    lazy val referenceV = parseScalaVersion(referenceVersion)
+    lazy val (tastyMinor, tastyIsExperimental) = expectedTastyVersion.split("\\.|-").take(4) match {
+      case Array("28", minor)                    => (minor.toInt, false)
+      case Array("28", minor, "experimental", _) => (minor.toInt, true)
+      case other => sys.error(s"Invalid TASTy version string: $expectedTastyVersion")
+    }
+
+    if(isNightly) {
+      assert(tastyIsExperimental, "TASTY needs to be experimental in nightly builds")
+      val expectedTastyMinor = version.patch match {
+        case 0 => version.minor
+        case 1 if referenceV.patch == 0 && referenceV.isRC =>
+          // Special case for a period when reference version is a new unstable minor
+          // Needed for non_bootstrapped tests requiring either stable tasty or the same experimental version produced by both reference and bootstrapped compiler
+          assert(version.minor == referenceV.minor, "Expected reference and base version to use the same minor")
+          version.minor
+        case _ => version.minor + 1
+      }
+      assert(tastyMinor == expectedTastyMinor, "Invalid TASTy minor version")
+    }
+
+    if(isRelease) {
+      assert(version.minor == tastyMinor, "Minor versions of TASTY vesion and Scala version should match in release builds")
+      assert(!referenceV.isRC, "Stable release needs to use stable compiler version")
+      if (version.isRC && version.patch == 0)
+        assert(tastyIsExperimental, "TASTy should be experimental when releasing a new minor version RC")
+      else
+        assert(!tastyIsExperimental, "Stable version cannot use experimental TASTY")
+    }
   }
 }
 
