@@ -81,6 +81,11 @@ object DottyJSPlugin extends AutoPlugin {
 object Build {
   import ScaladocConfigs._
 
+  /** Version of the Scala compiler used to build the artifacts.
+   *  Reference version should track the latest version pushed to Maven:
+   *  - In main branch it should be the last RC version
+   *  - In release branch it should be the last stable release
+   */
   val referenceVersion = "3.3.5"
 
   /** Version of the Scala compiler targeted in the current release cycle
