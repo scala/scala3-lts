@@ -120,9 +120,11 @@ object Build {
    *    - Major version is always 28
    *    - TASTY minor version:
    *      - in main (NIGHTLY): {if $patch == 0 || ${referenceVersion.matches(raw"3.$minor.0-RC\d")} then $minor else ${minor + 1}}
+   *      - in LTS branch (NIGHTLY): always equal to $minor
    *      - in release branch is always equal to $minor
    *    - TASTY experimental version:
    *      - in main (NIGHTLY) is always experimental
+   *      - in LTS branch (NIGHTLY) is always non-experimental
    *      - in release candidate branch is experimental if {patch == 0}
    *      - in stable release is always non-experimetnal
    */
