@@ -3031,7 +3031,7 @@ class JSCodeGen()(using genCtx: Context) {
       case singleDim :: Nil =>
         // Use a js.NewArray
         val arrayTypeRef = toTypeRef(arrayClassConstant.typeValue).asInstanceOf[jstpe.ArrayTypeRef]
-        js.NewArray(arrayTypeRef, genExpr(singleDim))
+        js.NewArray(arrayTypeRef, List(genExpr(singleDim)))
       case _ =>
         // Delegate to jlr.Array.newInstance
         js.ApplyStatic(js.ApplyFlags.empty, JLRArrayClassName, js.MethodIdent(JLRArrayNewInstanceMethodName),
@@ -4852,6 +4852,7 @@ class JSCodeGen()(using genCtx: Context) {
 object JSCodeGen {
 
   private val JLRArrayClassName = ClassName("java.lang.reflect.Array")
+  private val NullPointerExceptionClass = ClassName("java.lang.NullPointerException")
   private val JSObjectClassName = ClassName("scala.scalajs.js.Object")
   private val JavaScriptExceptionClassName = ClassName("scala.scalajs.js.JavaScriptException")
 

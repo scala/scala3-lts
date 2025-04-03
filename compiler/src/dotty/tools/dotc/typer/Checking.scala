@@ -40,6 +40,7 @@ import printing.Formatting.hlAsKeyword
 
 import collection.mutable
 import reporting.*
+import dotty.tools.dotc.core.TypeApplications.TypeParamInfo
 
 object Checking {
   import tpd.*
