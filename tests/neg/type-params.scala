@@ -14,7 +14,7 @@ class `various ancient kindedness`:
     type t = x[x] // error
   trait WellKindedBounded[s <: Throwable]:
     val foo: s[Int] // error
-  class WellKindedWrongSyntax[s <: List] // must be s[x] <: List[x] ?
+  class WellKindedWrongSyntax[s <: List] //  error in LTS-3.3
 
   class Monad[m[x]]
 
