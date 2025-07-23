@@ -162,7 +162,7 @@ object ScaladocTastyInspector:
     if tastyPaths.nonEmpty then
       val tastyOk = TastyInspector.inspectAllTastyFiles(tastyPaths, jarPaths, classpath)(inspector)
       if !tastyOk then
-        report.error("Failure")
+        report.error("Failed to analyse some of the tasty files, please check the above logs for details")
 
     val all = inspector.topLevels.result()
     all.groupBy(_._1).map { case (pckName, members) =>
