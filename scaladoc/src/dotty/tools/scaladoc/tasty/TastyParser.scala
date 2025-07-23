@@ -160,7 +160,9 @@ object ScaladocTastyInspector:
       report.error("File extension is not `tasty` or `jar`: " + invalidPath)
 
     if tastyPaths.nonEmpty then
-      TastyInspector.inspectAllTastyFiles(tastyPaths, jarPaths, classpath)(inspector)
+      val tastyOk = TastyInspector.inspectAllTastyFiles(tastyPaths, jarPaths, classpath)(inspector)
+      if !tastyOk then
+        report.error("Failure")
 
     val all = inspector.topLevels.result()
     all.groupBy(_._1).map { case (pckName, members) =>
