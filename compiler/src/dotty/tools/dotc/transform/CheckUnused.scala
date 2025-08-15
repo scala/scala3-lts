@@ -712,9 +712,6 @@ object CheckUnused:
       import Rewrites.ActionPatch
       type ImpSel = (Import, ImportSelector)
       def isUsed(sel: ImportSelector): Boolean = infos.sels.containsKey(sel)
-      @unused // avoid merge conflict
-      def isUsable(imp: Import, sel: ImportSelector): Boolean =
-        sel.isImportExclusion || infos.sels.containsKey(sel)
       def warnImport(warnable: ImpSel, actions: List[CodeAction] = Nil): Unit =
         val (imp, sel) = warnable
         val msg = UnusedSymbol.imports(actions)
