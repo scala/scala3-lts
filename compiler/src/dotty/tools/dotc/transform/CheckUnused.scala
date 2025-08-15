@@ -639,7 +639,6 @@ object CheckUnused:
         || m.is(Synthetic)
         || m.hasAnnotation(dd.UnusedAnnot)          // param of unused method
         || sym.owner.name.isContextFunction         // a ubiquitous parameter
-        || sym.isCanEqual
         || sym.info.dealias.typeSymbol.match        // more ubiquity
            case dd.DummyImplicitClass | dd.SubTypeClass | dd.SameTypeClass => true
            case tps =>
@@ -671,7 +670,6 @@ object CheckUnused:
     def checkLocal(sym: Symbol, pos: SrcPos) =
       if ctx.settings.WunusedHas.locals
         && !sym.is(InlineProxy)
-        && !sym.isCanEqual
       then
         if sym.is(Mutable) && infos.asss(sym) then
           warnAt(pos)(UnusedSymbol.localVars)
@@ -703,7 +701,9 @@ object CheckUnused:
       import scala.jdk.CollectionConverters.given
       import Rewrites.ActionPatch
       type ImpSel = (Import, ImportSelector)
-      def isUsed(sel: ImportSelector): Boolean = infos.sels.containsKey(sel)
+      // true if used or might be used, to imply don't warn about it
+      def isUsable(imp: Import, sel: ImportSelector): Boolean =
+        sel.isImportExclusion || infos.sels.containsKey(sel)
       def warnImport(warnable: ImpSel, actions: List[CodeAction] = Nil): Unit =
         val (imp, sel) = warnable
         val msg = UnusedSymbol.imports(actions)
@@ -978,8 +978,6 @@ object CheckUnused:
     def isSerializationSupport: Boolean =
       sym.is(Method) && serializationNames(sym.name.toTermName) && sym.owner.isClass
         && sym.owner.derivesFrom(defn.JavaSerializableClass)
-    def isCanEqual: Boolean =
-      sym.isOneOf(GivenOrImplicit) && sym.info.finalResultType.baseClasses.exists(_.derivesFrom(defn.CanEqualClass))
     def isMarkerTrait: Boolean =
       sym.info.hiBound.resultType.allMembers.forall: d =>
         val m = d.symbol
@@ -1012,21 +1010,6 @@ object CheckUnused:
     /** Generated import of cases from enum companion. */
     def isGeneratedByEnum: Boolean =
       imp.symbol.exists && imp.symbol.owner.is(Enum, butNot = Case)
-
-    /** Under -Wunused:strict-no-implicit-warn, avoid false positives
-     *  if this selector is a wildcard that might import implicits or
-     *  specifically does import an implicit.
-     *  Similarly, import of CanEqual must not warn, as it is always witness.
-     */
-    def isLoose(sel: ImportSelector): Boolean =
-      if ctx.settings.WunusedHas.strictNoImplicitWarn then
-        if sel.isWildcard
-          || imp.expr.tpe.member(sel.name.toTermName).hasAltWith(_.symbol.isOneOf(GivenOrImplicit))
-          || imp.expr.tpe.member(sel.name.toTypeName).hasAltWith(_.symbol.isOneOf(GivenOrImplicit))
-        then return true
-      if sel.isWildcard && sel.isGiven
-      then imp.expr.tpe.allMembers.exists(_.symbol.isCanEqual)
-      else imp.expr.tpe.member(sel.name.toTermName).hasAltWith(_.symbol.isCanEqual)
 
   extension (pos: SrcPos)
     def isZeroExtentSynthetic: Boolean = pos.span.isSynthetic && pos.span.isZeroExtent
