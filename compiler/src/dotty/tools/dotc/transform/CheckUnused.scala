@@ -10,6 +10,7 @@ import dotty.tools.dotc.core.Names.{Name, SimpleName, DerivedName, TermName, ter
 import dotty.tools.dotc.core.NameOps.{isAnonymousFunctionName, isReplWrapperName, isContextFunction, setterName}
 import dotty.tools.dotc.core.NameKinds.{
   BodyRetainerName, ContextBoundParamName, ContextFunctionParamName, DefaultGetterName, WildcardParamName}
+import dotty.tools.dotc.core.Scopes.newScope
 import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.{ClassSymbol, NoSymbol, Symbol, defn, isDeprecated, requiredClass, requiredModule}
 import dotty.tools.dotc.core.Types.*
@@ -702,8 +703,7 @@ object CheckUnused:
       import scala.jdk.CollectionConverters.given
       import Rewrites.ActionPatch
       type ImpSel = (Import, ImportSelector)
-      def isUsable(imp: Import, sel: ImportSelector): Boolean =
-        sel.isImportExclusion || infos.sels.containsKey(sel) || imp.isLoose(sel)
+      def isUsed(sel: ImportSelector): Boolean = infos.sels.containsKey(sel)
       def warnImport(warnable: ImpSel, actions: List[CodeAction] = Nil): Unit =
         val (imp, sel) = warnable
         val msg = UnusedSymbol.imports(actions)
@@ -1003,12 +1003,6 @@ object CheckUnused:
     def boundTpe: Type = sel.bound match
       case untpd.TypedSplice(tree) => tree.tpe
       case _ => NoType
-    /** This is used to ignore exclusion imports of the form import `qual.member as _`
-     *  because `sel.isUnimport` is too broad for old style `import concurrent._`.
-     */
-    def isImportExclusion: Boolean = sel.renamed match
-      case untpd.Ident(nme.WILDCARD) => true
-      case _ => false
 
   extension (imp: Import)(using Context)
     /** Is it the first import clause in a statement? `a.x` in `import a.x, b.{y, z}` */
