@@ -206,10 +206,5 @@ class TypeUtils:
 
       self.decl(nme.CONSTRUCTOR).altsWith(isApplicable).map(_.symbol)
 
-        /** Strip all outer refinements off this type */
-    def stripRefinement: Type = self match
-      case self: RefinedOrRecType => self.parent.stripRefinement
-      case seld => self
-
 end TypeUtils
 
