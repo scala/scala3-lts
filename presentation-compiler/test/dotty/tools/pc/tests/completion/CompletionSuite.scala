@@ -126,7 +126,6 @@ class CompletionSuite extends BaseCompletionSuite:
          |ensuring(cond: Boolean, msg: => Any): List.type
          |ensuring(cond: List.type => Boolean, msg: => Any): List.type
          |nn: List.type
-         |runtimeChecked scala.collection.immutable
          |formatted(fmtstr: String): String
          |→[B](y: B): (List.type, B)
          |""".stripMargin

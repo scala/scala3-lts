@@ -473,7 +473,6 @@ class CompletionExtensionSuite extends BaseCompletionSuite:
          |ensuring(cond: Boolean, msg: => Any): Bar
          |ensuring(cond: Bar => Boolean, msg: => Any): Bar
          |nn: `?1`.type
-         |runtimeChecked: `?2`.type
          |formatted(fmtstr: String): String
          |→[B](y: B): (Bar, B)
          | """.stripMargin
