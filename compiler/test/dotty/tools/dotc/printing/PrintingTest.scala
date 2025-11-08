@@ -52,9 +52,10 @@ class PrintingTest {
     FileDiff.checkAndDumpOrUpdate(path.toString, actualLines.toIndexedSeq, checkFilePath)
   }
 
-  def testIn(testsDir: String, phase: String) =
+  def testIn(testsDir: String, phase: String, exclude: io.Path => Boolean = _ => false) =
     val res = Directory(testsDir).list.toList
       .filter(f => f.extension == "scala")
+      .filterNot(exclude)
       .map { f => compileFile(f.jpath, phase) }
 
     val failed = res.filter(!_)
@@ -67,6 +68,8 @@ class PrintingTest {
 
   end testIn
 
+  private val isAtLeastJDK9 = scala.util.Properties.isJavaAtLeast("9")
+
   @Test
   def printing: Unit = testIn("tests/printing", "typer")
 
@@ -74,5 +77,9 @@ class PrintingTest {
   def untypedPrinting: Unit = testIn("tests/printing/untyped", "parser")
 
   @Test
-  def transformedPrinting: Unit = testIn("tests/printing/transformed", "repeatableAnnotations")
+  def transformedPrinting: Unit = testIn("tests/printing/transformed", "repeatableAnnotations",
+      exclude = path =>
+        if isAtLeastJDK9 then false // test all
+        else Seq("lazy-vals-new-varhandle.scala").contains(path.name)
+  )
 }
