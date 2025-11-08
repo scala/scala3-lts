@@ -14,6 +14,9 @@ object MiMaFilters {
     ProblemFilters.exclude[MissingFieldProblem]("scala.runtime.stdLibPatches.language#experimental.relaxedExtensionImports"),
     ProblemFilters.exclude[MissingClassProblem]("scala.runtime.stdLibPatches.language$experimental$relaxedExtensionImports$"),
     // end of New experimental features in 3.3.X
+
+    // Changes to lazy vals (added static constructors)
+    ProblemFilters.exclude[DirectMissingMethodProblem]("scala.Tuple.<clinit>"),
   )
   val TastyCore: Seq[ProblemFilter] = Seq(
     // Backported in 3.3.6
