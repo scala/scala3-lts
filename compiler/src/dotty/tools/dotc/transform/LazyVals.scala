@@ -286,14 +286,24 @@ class LazyVals extends MiniPhase with IdentityDenotTransformer {
     inline def apply[T](usingOffset: => T, usingVarHandle: => T)(using Context): T =
       if useVarHandles(using ctx) then usingVarHandle else usingOffset
 
-    private def checkVarHandlesAllowed(using Context) =
-      !ctx.settings.YlegacyLazyVals.value && {
+    private def checkVarHandlesAllowed(using Context) = {
+      val useLegacyImpl = ctx.settings.YlegacyLazyVals.value
+      val useFutureImpl = ctx.settings.YfutureLazyVals.value
+
+      if useLegacyImpl && useFutureImpl then
+        report.error(em"Both ${ctx.settings.YlegacyLazyVals.name} and ${ctx.settings.YfutureLazyVals.name} cannot be set simultaneously.")
+        false
+      else if useLegacyImpl || !useFutureImpl then
+        false
+      else {
         val releaseVersion = ctx.settings.javaOutputVersion.value
-        if releaseVersion.nonEmpty then
-          releaseVersion.toInt >= 9
+        if releaseVersion.nonEmpty && releaseVersion.toInt >= 9 then
+          true
         else
-          scala.util.Properties.isJavaAtLeast("9")
+          report.error(em"${ctx.settings.YfutureLazyVals.name} is set, but it requires explicit ${ctx.settings.javaOutputVersion.name} set to minimum required version 9 or higher.")
+          false
       }
+    }
 
     // Check if environment allows VarHandles, cached per run
     private var canUseVarHandles: Boolean = compiletime.uninitialized
