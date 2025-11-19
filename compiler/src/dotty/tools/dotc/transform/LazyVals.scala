@@ -110,7 +110,7 @@ class LazyVals extends MiniPhase with IdentityDenotTransformer {
    */
   override def transformTemplate(template: Template)(using Context): Tree = {
     val cls = ctx.owner.asClass
-    if !selectImpl.useVarHandles then //ctx.settings.YlegacyLazyVals.value then
+    if !selectImpl.useVarHandles then
       appendOffsetDefs.get(cls) match {
         case None => template
         case Some(data) =>
