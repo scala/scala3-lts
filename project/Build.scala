@@ -281,13 +281,6 @@ object Build {
     // I find supershell more distracting than helpful
     useSuperShell := false,
 
-    // Credentials to release to Sonatype
-    credentials ++= (
-      for {
-        username <- sys.env.get("SONATYPE_USER")
-        password <- sys.env.get("SONATYPE_PW")
-      } yield Credentials("Sonatype Nexus Repository Manager", "central.sonatype.com", username, password)
-    ).toList,
     PgpKeys.pgpPassphrase := sys.env.get("PGP_PW").map(_.toCharArray()),
     PgpKeys.useGpgPinentry := true,
 
@@ -1929,10 +1922,27 @@ object Build {
     publishMavenStyle := true,
     isSnapshot := version.value.contains("SNAPSHOT"),
     publishTo := {
-      val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
-      if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
-      else localStaging.value
+      if (sys.env.get("NEWNIGHTLY").contains("yes")) {
+        Some(sys.env("MAVEN_REPOSITORY_REALM") at sys.env("MAVEN_REPOSITORY_URL"))
+      } else if (isSnapshot.value) {
+        Some("central-snapshots" at "https://central.sonatype.com/repository/maven-snapshots/")
+      } else
+        localStaging.value
     },
+    credentials ++= (
+      if (sys.env.get("NEWNIGHTLY").contains("yes")) {
+        for {
+          username <- sys.env.get("MAVEN_REPOSITORY_USER")
+          token <- sys.env.get("MAVEN_REPOSITORY_TOKEN")
+        } yield Credentials(sys.env("MAVEN_REPOSITORY_REALM"), sys.env("MAVEN_REPOSITORY_HOST"), username, token)
+      }
+      else
+        for {
+          username <- sys.env.get("SONATYPE_USER")
+          password <- sys.env.get("SONATYPE_PW")
+        } yield Credentials("Sonatype Nexus Repository Manager", "central.sonatype.com", username, password)
+  
+    ).toList,
     publishConfiguration ~= (_.withOverwrite(true)),
     publishLocalConfiguration ~= (_.withOverwrite(true)),
     projectID ~= {id =>
