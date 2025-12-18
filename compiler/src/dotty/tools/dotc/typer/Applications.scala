@@ -1248,7 +1248,7 @@ trait Applications extends Compatibility {
     val isNamed = hasNamedArg(tree.args)
     val typedArgs = if (isNamed) typedNamedArgs(tree.args) else tree.args.mapconserve(typedType(_))
     record("typedTypeApply")
-    typedExpr(tree.fun, PolyProto(typedArgs, pt)) match {
+    typedExpr(tree.fun, PolyProto(typedArgs, pt.ignoreSelectionProto)) match {
       case fun: TypeApply if !ctx.isAfterTyper =>
         val function = fun.fun
         val args = (fun.args ++ tree.args).map(_.show).mkString(", ")

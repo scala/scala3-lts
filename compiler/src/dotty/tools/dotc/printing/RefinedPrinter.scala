@@ -306,9 +306,13 @@ class RefinedPrinter(_ctx: Context) extends PlainPrinter(_ctx) {
         ~ toText(resultType)
         ~ "]"
       case IgnoredProto(ignored) =>
-        "?" ~ (("(ignored: " ~ toText(ignored) ~ ")") provided printDebug)
-      case tp @ PolyProto(targs, resType) =>
-        "[applied to [" ~ toTextGlobal(targs, ", ") ~ "] returning " ~ toText(resType)
+        "?" ~ ("(ignored: " ~ toText(ignored) ~ ")").provided(printDebug)
+      case tp @ PolyProto(targs, resultType) =>
+        "[applied to ["
+        ~ toTextGlobal(targs, ", ")
+        ~ "] returning "
+        ~ toText(resultType)
+        ~ "]"
       case _ =>
         super.toText(tp)
     }
