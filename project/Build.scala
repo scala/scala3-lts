@@ -1932,8 +1932,8 @@ object Build {
     credentials ++= (
       if (sys.env.get("NEWNIGHTLY").contains("yes")) {
         for {
-          username <- sys.env.get("MAVEN_REPOSITORY_USER")
-          token <- sys.env.get("MAVEN_REPOSITORY_TOKEN")
+          username <- sys.env.get("SONATYPE_USER")
+          token <- sys.env.get("SONATYPE_PW")
         } yield Credentials(sys.env("MAVEN_REPOSITORY_REALM"), sys.env("MAVEN_REPOSITORY_HOST"), username, token)
       }
       else
