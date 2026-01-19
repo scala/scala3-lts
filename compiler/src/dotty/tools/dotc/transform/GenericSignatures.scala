@@ -19,6 +19,7 @@ import config.Printers.transforms
 import reporting.trace
 import java.lang.StringBuilder
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
 /** Helper object to generate generic java signatures, as defined in
@@ -48,24 +49,21 @@ object GenericSignatures {
     val builder = new StringBuilder(64)
     val isTraitSignature = sym0.enclosingClass.is(Trait)
 
-    // Collect class-level type parameter names to avoid conflicts with method-level type parameters
-    val usedNames = collection.mutable.Set.empty[String]
-    if(sym0.is(Method)) {
-      sym0.enclosingClass.typeParams.foreach { tp =>
-        usedNames += sanitizeName(tp.name)
-      }
-    }
+    // Track class type parameter names that are shadowed by method type parameters
+    // Used to trigger renaming of method type parameters to avoid conflicts
+    val shadowedClassTypeParamNames = collection.mutable.Set.empty[String]
     val methodTypeParamRenaming = collection.mutable.Map.empty[String, String]
+
     def freshTypeParamName(sanitizedName: String): String = {
-      if !usedNames.contains(sanitizedName) then sanitizedName
+      if !shadowedClassTypeParamNames.contains(sanitizedName) then sanitizedName
       else {
         var i = 1
         var newName = sanitizedName + i
-        while usedNames.contains(newName) do
+        while shadowedClassTypeParamNames.contains(newName) do
           i += 1
           newName = sanitizedName + i
         methodTypeParamRenaming(sanitizedName) = newName
-        usedNames += newName
+        shadowedClassTypeParamNames += newName
         newName
       }
     }
@@ -338,36 +336,28 @@ object GenericSignatures {
         case ExprType(restpe) =>
           jsig1(defn.FunctionType(0).appliedTo(restpe))
 
-        case PolyType(tparams, mtpe: MethodType) =>
-          assert(tparams.nonEmpty)
-          if (toplevel && !sym0.isConstructor) polyParamSig(tparams)
-          jsig(mtpe)
-
-        // Nullary polymorphic method
-        case PolyType(tparams, restpe) =>
-          assert(tparams.nonEmpty)
-          if (toplevel) polyParamSig(tparams)
-          builder.append("()")
-          methodResultSig(restpe)
-
-        case mtpe: MethodType =>
-          // erased method parameters do not make it to the bytecode.
-          def effectiveParamInfoss(t: Type)(using Context): List[List[Type]] = t match {
-            case t: MethodType if t.hasErasedParams =>
-              t.paramInfos.zip(t.erasedParams).collect{ case (i, false) => i }
-                :: effectiveParamInfoss(t.resType)
-            case t: MethodType => t.paramInfos :: effectiveParamInfoss(t.resType)
-            case _ => Nil
+        case mtd: MethodOrPoly =>
+          val (tparams, vparams, rte) = collectMethodParams(mtd)
+          if (toplevel && !sym0.isConstructor) {
+            if (sym0.is(Method)) {
+              val (usedMethodTypeParamNames, usedClassTypeParams) = collectUsedTypeParams(vparams :+ rte, sym0)
+              val methodTypeParamNames = tparams.map(tp => sanitizeName(tp.paramName.lastPart)).toSet
+              // Only add class type parameters to shadowedClassTypeParamNames if they are:
+              // 1. Referenced in the method signature, AND
+              // 2. Shadowed by a method type parameter with the same name
+              // This will trigger renaming of the method type parameter
+              usedClassTypeParams.foreach { classTypeParam =>
+                val classTypeParamName = sanitizeName(classTypeParam.name)
+                if methodTypeParamNames.contains(classTypeParamName) then
+                  shadowedClassTypeParamNames += classTypeParamName
+              }
+            }
+            polyParamSig(tparams)
           }
-          val params = effectiveParamInfoss(mtpe).flatten
-          val restpe = mtpe.finalResultType
           builder.append('(')
-          // TODO: Update once we support varargs
-          params.foreach { tp =>
-            jsig1(tp)
-          }
+          for vparam <- vparams do jsig1(vparam)
           builder.append(')')
-          methodResultSig(restpe)
+          methodResultSig(rte)
 
         case tp: AndType =>
           // Only intersections appearing as the upper-bound of a type parameter
@@ -459,6 +449,12 @@ object GenericSignatures {
         (initialSymbol.is(Method) && initialSymbol.typeParams.contains(sym))
       )
 
+  private def isTypeParameterInMethSig(sym: Symbol, initialSymbol: Symbol)(using Context) =
+    !sym.maybeOwner.isTypeParam &&
+      sym.isTypeParam && (
+        (initialSymbol.is(Method) && initialSymbol.typeParams.contains(sym))
+      )
+
   // @M #2585 when generating a java generic signature that includes
   // a selection of an inner class p.I, (p = `pre`, I = `cls`) must
   // rewrite to p'.I, where p' refers to the class that directly defines
@@ -520,4 +516,67 @@ object GenericSignatures {
         }
       else x
   }
+
+  private def collectMethodParams(mtd: MethodOrPoly)(using Context): (List[TypeParamInfo], List[Type], Type) =
+    val tparams = ListBuffer.empty[TypeParamInfo]
+    val vparams = ListBuffer.empty[Type]
+
+    @tailrec def recur(tpe: Type): Type = tpe match
+      case mtd: MethodType =>
+        vparams ++= mtd.paramInfos.filterNot(_.hasAnnotation(defn.ErasedParamAnnot))
+        recur(mtd.resType)
+      case PolyType(tps, tpe) =>
+        tparams ++= tps
+        recur(tpe)
+      case _ =>
+        tpe
+    end recur
+
+    val rte = recur(mtd)
+    (tparams.toList, vparams.toList, rte)
+  end collectMethodParams
+
+  /** Collect type parameters that are actually used in the given types. */
+  private def collectUsedTypeParams(types: List[Type], initialSymbol: Symbol)(using Context): (Set[Name], Set[Symbol]) =
+    val usedMethodTypeParamNames = collection.mutable.Set.empty[Name]
+    val usedClassTypeParams = collection.mutable.Set.empty[Symbol]
+
+    def collect(tp: Type): Unit = tp.dealias match
+      case ref @ TypeParamRef(_: PolyType, _) =>
+        usedMethodTypeParamNames += ref.paramName
+      case TypeRef(pre, _) =>
+        val sym = tp.typeSymbol
+        if isTypeParameterInMethSig(sym, initialSymbol) then
+          usedMethodTypeParamNames += sym.name
+        else if sym.isTypeParam && sym.isContainedIn(initialSymbol.topLevelClass) then
+          usedClassTypeParams += sym
+        else
+          collect(pre)
+      case AppliedType(tycon, args) =>
+        collect(tycon)
+        args.foreach(collect)
+      case AndType(tp1, tp2) =>
+        collect(tp1)
+        collect(tp2)
+      case OrType(tp1, tp2) =>
+        collect(tp1)
+        collect(tp2)
+      case RefinedType(parent, _, refinedInfo) =>
+        collect(parent)
+        collect(refinedInfo)
+      case TypeBounds(lo, hi) =>
+        collect(lo)
+        collect(hi)
+      case ExprType(res) =>
+        collect(res)
+      case AnnotatedType(tpe, _) =>
+        collect(tpe)
+      case defn.ArrayOf(elemtp) =>
+        collect(elemtp)
+      case _ =>
+        ()
+
+    types.foreach(collect)
+    (usedMethodTypeParamNames.toSet, usedClassTypeParams.toSet)
+  end collectUsedTypeParams
 }
