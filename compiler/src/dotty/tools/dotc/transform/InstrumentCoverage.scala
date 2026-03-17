@@ -400,8 +400,10 @@ class InstrumentCoverage extends MacroTransform with IdentityDenotTransformer:
 
           case tree: PackageDef =>
             if isFileIncluded(tree.srcPos.sourcePos.source) && isClassIncluded(tree.symbol) then
-              // only transform the statements of the package
-              cpy.PackageDef(tree)(tree.pid, transform(tree.stats))
+              // Use transformStats (not transform) to process statements with updated context.
+              // This ensures language imports like `scala.language.unsafeNulls` are properly
+              // processed for subsequent statements in the package.
+              cpy.PackageDef(tree)(tree.pid, transformStats(tree.stats, tree.symbol))
             else
               tree
 
