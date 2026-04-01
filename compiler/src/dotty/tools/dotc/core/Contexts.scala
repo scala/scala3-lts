@@ -908,6 +908,7 @@ object Contexts {
      */
     def initialize()(using Context): Unit = {
       _platform = newPlatform
+      platform.init()
       definitions.init()
     }
 
