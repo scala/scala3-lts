@@ -31,3 +31,14 @@ object Test:
     case A(_) => 3 // nowarn: should not be reported as unreachable
     case A(_) => 3 // warn: unreacheable
     case C => 4
+
+enum Color:
+  case Red, Green, Blue
+
+case class Wrapper(c: Color)
+
+def wrappedColorName(w: Wrapper): String =
+  w match // warn: match may not be exhaustive: It would fail on pattern case: Wrapper(Red)
+    case Wrapper(c) if c match
+      case Color.Green => "green"
+      case Color.Blue => "blue"

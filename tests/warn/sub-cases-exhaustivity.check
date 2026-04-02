@@ -18,3 +18,11 @@
 32 |    case A(_) => 3 // warn: unreacheable
    |         ^^^^
    |         Unreachable case
+-- [E029] Pattern Match Exhaustivity Warning: tests/warn/sub-cases-exhaustivity.scala:41:2 -----------------------------
+41 |  w match // warn: match may not be exhaustive: It would fail on pattern case: Wrapper(Red)
+   |  ^
+   |  match may not be exhaustive.
+   |
+   |  It would fail on pattern case: Wrapper(Red)
+   |
+   | longer explanation available when compiling with `-explain`
