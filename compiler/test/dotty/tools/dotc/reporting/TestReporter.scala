@@ -42,7 +42,7 @@ extends Reporter with UniqueMessagePositions with HideNonSensicalMessages with M
 
   protected final def inlineInfo(pos: SourcePosition)(using Context): String =
     if (pos.exists) {
-      if (pos.outer.exists)
+      if (pos.outer != null)
         i"\ninlined at ${pos.outer}:\n" + inlineInfo(pos.outer)
       else ""
     }
