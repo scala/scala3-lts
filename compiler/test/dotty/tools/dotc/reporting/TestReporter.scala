@@ -17,13 +17,6 @@ import Diagnostic.*
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
-import util.SourcePosition
-import core.Contexts.*
-import Diagnostic.*
-import dotty.Properties
-import interfaces.Diagnostic.{ERROR, WARNING}
-
-import scala.io.Codec
 
 class TestReporter protected (outWriter: PrintWriter, logLevel: Int)
 extends Reporter with UniqueMessagePositions with HideNonSensicalMessages with MessageRendering {

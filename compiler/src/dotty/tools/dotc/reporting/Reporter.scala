@@ -2,8 +2,6 @@ package dotty.tools
 package dotc
 package reporting
 
-import scala.language.unsafeNulls
-
 import dotty.tools.dotc.core.Contexts.*
 import dotty.tools.dotc.core.Mode
 import dotty.tools.dotc.core.Symbols.{NoSymbol, Symbol}
@@ -41,7 +39,7 @@ object Reporter {
     (mc, ctx) => ctx.reporter.report(mc)(using ctx)
 
   /** Show prompt if `-Xprompt` is passed as a flag to the compiler */
-  def displayPrompt(reader: BufferedReader, writer: PrintWriter): Unit = {
+  def displayPrompt(reader: BufferedReader | Null, writer: PrintWriter): Unit = {
     writer.println()
     writer.print("a)bort, s)tack, r)esume: ")
     writer.flush()
