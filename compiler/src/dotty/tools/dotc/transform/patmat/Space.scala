@@ -966,8 +966,6 @@ object SpaceEngine {
 
     if selectorIsBoundVar(selector, pat) then
       simplify(intersect(project(pat), subSpace))
-    else if simplify(minus(project(selTyp), subSpace)) == Empty then
-      project(pat)
     else selectorParamIndex(selector, pat) match
       case Some(idx) =>
         project(pat) match
@@ -975,7 +973,9 @@ object SpaceEngine {
             val narrowedParam = simplify(intersect(params(idx), subSpace))
             simplify(Prod(tp, unappTp, params.updated(idx, narrowedParam)))
           case other => other
-      case None => Empty
+      case None =>
+        if simplify(minus(project(selTyp), subSpace)) == Empty then project(pat)
+        else Empty
 
   /** Project a single CaseDef to the space it definitely covers */
   private def projectCaseDef(c: CaseDef)(using Context): Space =
