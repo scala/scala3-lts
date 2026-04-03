@@ -931,10 +931,10 @@ object SpaceEngine {
   })
 
   /** Check if the SubMatch selector references the variable bound by the outer pattern.
-   *  ```scala
-   *      case x @ _ if x match
-   *           ^ pat    ^ selector
-   *  ```
+   *
+   *  case x @ _ if x match
+   *       ^ pat    ^ selector
+   *
    */
   private def selectorIsBoundVar(selector: Tree, pat: Tree)(using Context): Boolean =
     pat match
@@ -942,10 +942,10 @@ object SpaceEngine {
       case _ => false
 
   /** Find the index of the parameter in an outer UnApply pattern that directly binds the selector symbol.
-   *  ```scala
-   *      case Wrapper(c) if c match
-   *                   ^ returns Some(0)
-   *  ```
+   *
+   *  case Wrapper(c) if c match
+   *               ^ returns Some(0)
+   *
    */
   private def selectorParamIndex(selector: Tree, pat: Tree)(using Context): Option[Int] =
     pat match
