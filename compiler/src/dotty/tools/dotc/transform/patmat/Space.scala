@@ -938,7 +938,7 @@ object SpaceEngine {
    */
   private def selectorIsBoundVar(selector: Tree, pat: Tree)(using Context): Boolean =
     pat match
-      case Bind(_, _) => selector.symbol == pat.symbol
+      case b: Bind => selector.symbol == b.symbol
       case _ => false
 
   /** Find the index of the parameter in an outer UnApply pattern that directly binds the selector symbol.
@@ -948,8 +948,7 @@ object SpaceEngine {
    *
    */
   private def selectorParamIndex(selector: Tree, pat: Tree)(using Context): Option[Int] =
-    pat match
-      case Bind(_, inner) => selectorParamIndex(selector, inner)
+    unbind(pat) match
       case UnApply(_, _, pats) =>
         val idx = pats.indexWhere {
           case b: Bind => b.symbol == selector.symbol
@@ -958,30 +957,30 @@ object SpaceEngine {
         if idx >= 0 then Some(idx) else None
       case _ => None
 
-  private def projectSubMatch(pat: Tree, sm: SubMatch)(using Context): Space =
+  private def projectSubMatch(pat: Tree, sm: SubMatch)(using Context): Option[Space] =
     val Match(selector, cases) = sm
 
     val subSpace = Or(cases.map(projectCaseDef))
     val selTyp = toUnderlying(selector.tpe)
 
     if selectorIsBoundVar(selector, pat) then
-      simplify(intersect(project(pat), subSpace))
+      Some(simplify(intersect(project(pat), subSpace)))
     else selectorParamIndex(selector, pat) match
       case Some(idx) =>
         project(pat) match
           case Prod(tp, unappTp, params) =>
             val narrowedParam = simplify(intersect(params(idx), subSpace))
-            simplify(Prod(tp, unappTp, params.updated(idx, narrowedParam)))
-          case other => other
+            Some(simplify(Prod(tp, unappTp, params.updated(idx, narrowedParam))))
+          case other => Some(other)
       case None =>
-        if simplify(minus(project(selTyp), subSpace)) == Empty then project(pat)
-        else Empty
+        if simplify(minus(project(selTyp), subSpace)) == Empty then Some(project(pat))
+        else None
 
   /** Project a single CaseDef to the space it definitely covers */
   private def projectCaseDef(c: CaseDef)(using Context): Space =
     if !c.guard.isEmpty then Empty
     else c.body match
-      case sm: SubMatch => projectSubMatch(c.pat, sm)
+      case sm: SubMatch => projectSubMatch(c.pat, sm).getOrElse(Empty)
       case _ => project(c.pat)
 
   def checkExhaustivity(m: Match)(using Context): Unit = trace(i"checkExhaustivity($m)") {
@@ -1032,7 +1031,12 @@ object SpaceEngine {
       cases match
         case Nil =>
         case (c @ CaseDef(pat, _, _)) :: rest =>
-          val curr = trace(i"project($pat)")(projectPat(pat))
+          val (curr, hasContrib) = c.body match
+            case sm: SubMatch =>
+              projectSubMatch(pat, sm) match
+                case Some(smSpace) => (smSpace, true)
+                case None => (projectPat(pat), false)
+            case _ => (projectPat(pat), true)
           val covered = trace("covered")(simplify(intersect(curr, targetSpace)))
           val prev = trace("prev")(simplify(Or(prevs)))
           if prev == Empty && covered == Empty then // defer until a case is reachable
@@ -1057,8 +1061,8 @@ object SpaceEngine {
                 hadNullOnly = true
                 report.warning(MatchCaseOnlyNullWarning(), pat.srcPos)
 
-            // in redundancy check, take guard as false (or potential sub cases as partial) for a sound approximation
-            val newPrev = if !c.guard.isEmpty || c.body.isInstanceOf[SubMatch] then prevs else covered :: prevs
+            // in redundancy check, take guard as false for a sound approximation
+            val newPrev = if hasContrib && c.guard.isEmpty then covered :: prevs else prevs
             recur(rest, newPrev, Nil)
 
     recur(m.cases, Nil, Nil)

@@ -42,3 +42,27 @@ def wrappedColorName(w: Wrapper): String =
     case Wrapper(c) if c match
       case Color.Green => "green"
       case Color.Blue => "blue"
+
+enum AB:
+  case A, B
+
+def testBoundVarReachability(ab: AB) = ab match
+  case x if x match
+    case AB.A => "a"
+    case AB.B => "b"
+  case AB.A => "unreachable" // warn
+
+def testParamIndexReachability(w: Wrapper) = w match
+  case Wrapper(c) if c match
+    case Color.Red   => "red"
+    case Color.Green => "green"
+  case Wrapper(Color.Red)  => "unreachable" // warn
+  case Wrapper(Color.Blue) => "blue"        // not unreachable
+
+def testCombinedReachability(w: Wrapper) = w match
+  case Wrapper(c) if c match
+    case Color.Red   => "red"
+    case Color.Green => "green"
+  case Wrapper(c) if c match
+    case Color.Blue  => "blue"
+  case Wrapper(_) => "unreachable" // warn

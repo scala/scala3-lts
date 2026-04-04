@@ -26,3 +26,15 @@
    |  It would fail on pattern case: Wrapper(Red)
    |
    | longer explanation available when compiling with `-explain`
+-- [E030] Match case Unreachable Warning: tests/warn/sub-cases-exhaustivity.scala:53:10 --------------------------------
+53 |  case AB.A => "unreachable" // warn
+   |       ^^^^
+   |       Unreachable case
+-- [E030] Match case Unreachable Warning: tests/warn/sub-cases-exhaustivity.scala:59:14 --------------------------------
+59 |  case Wrapper(Color.Red)  => "unreachable" // warn
+   |       ^^^^^^^^^^^^^^^^^^
+   |       Unreachable case
+-- [E030] Match case Unreachable Warning: tests/warn/sub-cases-exhaustivity.scala:68:14 --------------------------------
+68 |  case Wrapper(_) => "unreachable" // warn
+   |       ^^^^^^^^^^
+   |       Unreachable case
