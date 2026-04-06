@@ -977,12 +977,25 @@ object SpaceEngine {
         if simplify(minus(project(selTyp), subSpace)) == Empty then Some(patSpace)
         else None
 
+  /** Resolve the space covered by a case and whether it may be partial.
+   *  @return (space, maybePartial) where maybePartial is true when the case
+   *          may not fully cover its pattern space (due to a guard or unresolvable SubMatch).
+   */
+  private def resolveCaseDef(c: CaseDef, projectPat: Tree => Space)(using Context): (Space, Boolean) =
+    def patSpace = projectPat(c.pat)
+
+    if !c.guard.isEmpty then (patSpace, true)
+    else c.body match
+      case sm: SubMatch =>
+        projectSubMatch(c.pat, sm) match
+          case Some(space) => (space, false)
+          case None => (patSpace, true)
+      case _ => (patSpace, false)
+
   /** Project a single CaseDef to the space it definitely covers */
   private def projectCaseDef(c: CaseDef)(using Context): Space =
-    if !c.guard.isEmpty then Empty
-    else c.body match
-      case sm: SubMatch => projectSubMatch(c.pat, sm).getOrElse(Empty)
-      case _ => project(c.pat)
+    val (space, maybePartial) = resolveCaseDef(c, project)
+    if maybePartial then Empty else space
 
   def checkExhaustivity(m: Match)(using Context): Unit = trace(i"checkExhaustivity($m)") {
     val selTyp = toUnderlying(m.selector.tpe.stripUnsafeNulls()).dealias
@@ -1032,12 +1045,7 @@ object SpaceEngine {
       cases match
         case Nil =>
         case (c @ CaseDef(pat, _, _)) :: rest =>
-          val (curr, maybePartial) = c.body match
-            case sm: SubMatch if c.guard.isEmpty =>
-              projectSubMatch(pat, sm) match
-                case Some(smSpace) => (smSpace, false)
-                case None => (projectPat(pat), true)
-            case _ => (projectPat(pat), !c.guard.isEmpty)
+          val (curr, maybePartial) = resolveCaseDef(c, projectPat)
           val covered = trace("covered")(simplify(intersect(curr, targetSpace)))
           val prev = trace("prev")(simplify(Or(prevs)))
           if prev == Empty && covered == Empty then // defer until a case is reachable
