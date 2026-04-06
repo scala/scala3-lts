@@ -971,7 +971,7 @@ object SpaceEngine {
           case Prod(tp, unappTp, params) =>
             val narrowedParam = simplify(intersect(params(idx), subSpace))
             Some(simplify(Prod(tp, unappTp, params.updated(idx, narrowedParam))))
-          case other => Some(other)
+          case _ => None
       case None =>
         if simplify(minus(project(selTyp), subSpace)) == Empty then Some(project(pat))
         else None
@@ -1031,12 +1031,12 @@ object SpaceEngine {
       cases match
         case Nil =>
         case (c @ CaseDef(pat, _, _)) :: rest =>
-          val (curr, hasContrib) = c.body match
-            case sm: SubMatch =>
+          val (curr, maybePartial) = c.body match
+            case sm: SubMatch if c.guard.isEmpty =>
               projectSubMatch(pat, sm) match
-                case Some(smSpace) => (smSpace, true)
-                case None => (projectPat(pat), false)
-            case _ => (projectPat(pat), true)
+                case Some(smSpace) => (smSpace, false)
+                case None => (projectPat(pat), true)
+            case _ => (projectPat(pat), !c.guard.isEmpty)
           val covered = trace("covered")(simplify(intersect(curr, targetSpace)))
           val prev = trace("prev")(simplify(Or(prevs)))
           if prev == Empty && covered == Empty then // defer until a case is reachable
@@ -1062,7 +1062,7 @@ object SpaceEngine {
                 report.warning(MatchCaseOnlyNullWarning(), pat.srcPos)
 
             // in redundancy check, take guard as false for a sound approximation
-            val newPrev = if hasContrib && c.guard.isEmpty then covered :: prevs else prevs
+            val newPrev = if maybePartial then prevs else covered :: prevs
             recur(rest, newPrev, Nil)
 
     recur(m.cases, Nil, Nil)
