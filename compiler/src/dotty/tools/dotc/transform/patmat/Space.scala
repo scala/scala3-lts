@@ -961,19 +961,20 @@ object SpaceEngine {
     val Match(selector, cases) = sm
 
     val subSpace = Or(cases.map(projectCaseDef))
-    val selTyp = toUnderlying(selector.tpe)
+    def selTyp = toUnderlying(selector.tpe)
+    def patSpace = project(pat)
 
     if selectorIsBoundVar(selector, pat) then
-      Some(simplify(intersect(project(pat), subSpace)))
+      Some(simplify(intersect(patSpace, subSpace)))
     else selectorParamIndex(selector, pat) match
       case Some(idx) =>
-        project(pat) match
+        patSpace match
           case Prod(tp, unappTp, params) =>
             val narrowedParam = simplify(intersect(params(idx), subSpace))
             Some(simplify(Prod(tp, unappTp, params.updated(idx, narrowedParam))))
           case _ => None
       case None =>
-        if simplify(minus(project(selTyp), subSpace)) == Empty then Some(project(pat))
+        if simplify(minus(project(selTyp), subSpace)) == Empty then Some(patSpace)
         else None
 
   /** Project a single CaseDef to the space it definitely covers */

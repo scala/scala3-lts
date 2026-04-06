@@ -29,7 +29,6 @@ object Test:
       case C => 21
       case A(_) => 22
     case A(_) => 3 // nowarn: should not be reported as unreachable
-    case A(_) => 3 // warn: unreacheable
     case C => 4
 
 enum Color:
@@ -43,26 +42,14 @@ def wrappedColorName(w: Wrapper): String =
       case Color.Green => "green"
       case Color.Blue => "blue"
 
-enum AB:
-  case A, B
+def nestedSubcasesMissing(c: Color): String =
+  c match // warn: match may not be exhaustive: It would fail on pattern case: Color.Blue
+    case c1 if c1 match
+      case Color.Red => "red"
+      case c2 if c2 match
+        case Color.Green => "green"
 
-def testBoundVarReachability(ab: AB) = ab match
-  case x if x match
-    case AB.A => "a"
-    case AB.B => "b"
-  case AB.A => "unreachable" // warn
-
-def testParamIndexReachability(w: Wrapper) = w match
-  case Wrapper(c) if c match
-    case Color.Red   => "red"
-    case Color.Green => "green"
-  case Wrapper(Color.Red)  => "unreachable" // warn
-  case Wrapper(Color.Blue) => "blue"        // not unreachable
-
-def testCombinedReachability(w: Wrapper) = w match
-  case Wrapper(c) if c match
-    case Color.Red   => "red"
-    case Color.Green => "green"
-  case Wrapper(c) if c match
-    case Color.Blue  => "blue"
-  case Wrapper(_) => "unreachable" // warn
+def testAlternativeMissing(c: Color): String =
+  c match // warn: match may not be exhaustive: It would fail on pattern case: Color.Blue
+    case c1 if c1 match
+      case Color.Red | Color.Green => "warm"

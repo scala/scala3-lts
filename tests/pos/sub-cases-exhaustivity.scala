@@ -48,3 +48,33 @@ def wrappedColorName2(w: Wrapper): String = w match
     case Color.Green => "green"
   case Wrapper(c) if c match
     case Color.Blue => "blue"
+
+def colorNameAlt(c: Color): String = c match
+  case c1 if c1 match
+    case Color.Red | Color.Green => "warm"
+    case Color.Blue => "cool"
+
+def wrappedColorBind(w: Wrapper): String = w match
+  case x @ Wrapper(c) if c match
+    case Color.Red => "red"
+    case Color.Green => "green"
+    case Color.Blue => "blue"
+
+def nestedSubcases(c: Color): String = c match
+  case c1 if c1 match
+    case Color.Red => "red"
+    case c2 if c2 match
+      case Color.Green => "green"
+      case Color.Blue => "blue"
+
+enum Version:
+  case Legacy
+  case Stable(major: Int, minor: Int)
+
+case class Document(title: String, version: Version)
+
+def getVersion(d: Option[Document]): String = d match
+  case Some(x) if x.version match
+    case Version.Stable(m, n) => s"$m.$n"
+    case Version.Legacy => "legacy"
+  case None => "none"

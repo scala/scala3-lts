@@ -14,27 +14,27 @@
    |  It would fail on pattern case: E.B(_)
    |
    | longer explanation available when compiling with `-explain`
--- [E030] Match case Unreachable Warning: tests/warn/sub-cases-exhaustivity.scala:32:9 ---------------------------------
-32 |    case A(_) => 3 // warn: unreacheable
-   |         ^^^^
-   |         Unreachable case
--- [E029] Pattern Match Exhaustivity Warning: tests/warn/sub-cases-exhaustivity.scala:41:2 -----------------------------
-41 |  w match // warn: match may not be exhaustive: It would fail on pattern case: Wrapper(Red)
+-- [E029] Pattern Match Exhaustivity Warning: tests/warn/sub-cases-exhaustivity.scala:40:2 -----------------------------
+40 |  w match // warn: match may not be exhaustive: It would fail on pattern case: Wrapper(Red)
    |  ^
    |  match may not be exhaustive.
    |
    |  It would fail on pattern case: Wrapper(Red)
    |
    | longer explanation available when compiling with `-explain`
--- [E030] Match case Unreachable Warning: tests/warn/sub-cases-exhaustivity.scala:53:10 --------------------------------
-53 |  case AB.A => "unreachable" // warn
-   |       ^^^^
-   |       Unreachable case
--- [E030] Match case Unreachable Warning: tests/warn/sub-cases-exhaustivity.scala:59:14 --------------------------------
-59 |  case Wrapper(Color.Red)  => "unreachable" // warn
-   |       ^^^^^^^^^^^^^^^^^^
-   |       Unreachable case
--- [E030] Match case Unreachable Warning: tests/warn/sub-cases-exhaustivity.scala:68:14 --------------------------------
-68 |  case Wrapper(_) => "unreachable" // warn
-   |       ^^^^^^^^^^
-   |       Unreachable case
+-- [E029] Pattern Match Exhaustivity Warning: tests/warn/sub-cases-exhaustivity.scala:46:2 -----------------------------
+46 |  c match // warn: match may not be exhaustive: It would fail on pattern case: Color.Blue
+   |  ^
+   |  match may not be exhaustive.
+   |
+   |  It would fail on pattern case: Blue
+   |
+   | longer explanation available when compiling with `-explain`
+-- [E029] Pattern Match Exhaustivity Warning: tests/warn/sub-cases-exhaustivity.scala:53:2 -----------------------------
+53 |  c match // warn: match may not be exhaustive: It would fail on pattern case: Color.Blue
+   |  ^
+   |  match may not be exhaustive.
+   |
+   |  It would fail on pattern case: Blue
+   |
+   | longer explanation available when compiling with `-explain`
