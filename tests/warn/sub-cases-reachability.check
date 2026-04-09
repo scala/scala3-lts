@@ -22,3 +22,11 @@
 50 |  case Color.Red => "unreachable" // warn
    |       ^^^^^^^^^
    |       Unreachable case
+-- [E030] Match case Unreachable Warning: tests/warn/sub-cases-reachability.scala:63:7 ---------------------------------
+63 |  case (Color.Red, _) => "unreachable" // warn
+   |       ^^^^^^^^^^^^^^
+   |       Unreachable case
+-- [E030] Match case Unreachable Warning: tests/warn/sub-cases-reachability.scala:69:15 --------------------------------
+69 |  case Document(_, Version.Legacy) => "unreachable" // warn
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |       Unreachable case

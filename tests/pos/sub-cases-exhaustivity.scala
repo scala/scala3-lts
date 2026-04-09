@@ -78,3 +78,40 @@ def getVersion(d: Option[Document]): String = d match
     case Version.Stable(m, n) => s"$m.$n"
     case Version.Legacy => "legacy"
   case None => "none"
+
+sealed trait Shape
+case class Circle(r: Double) extends Shape
+case class Rectangle(w: Double, h: Double) extends Shape
+
+def tupleFirstExhaustive(pair: (Color, Color)): String = pair match
+  case (a, b) if a match
+    case Color.Red   => "red first"
+    case Color.Green => "green first"
+    case Color.Blue  => "blue first"
+
+def tupleSecondExhaustive(pair: (Color, Color)): String = pair match
+  case (a, b) if b match
+    case Color.Red   => "red second"
+    case Color.Green => "green second"
+    case Color.Blue  => "blue second"
+
+def typedBoundExhaustive(s: Shape): String = s match
+  case x: Circle if x match
+    case Circle(r) => s"circle r=$r"
+  case _: Rectangle => "rectangle"
+
+def typedGuardedFallback(s: Shape): String = s match
+  case x: Circle if x match
+    case Circle(r) if r > 0 => "positive circle"
+  case _: Circle    => "other circle"
+  case _: Rectangle => "rectangle"
+
+def fieldAccessExhaustive(d: Document): String = d match
+  case x if x.version match
+    case Version.Stable(m, n) => s"$m.$n"
+    case Version.Legacy => "legacy"
+
+def fieldAccessTypedBound(d: Document): String = d match
+  case x: Document if x.version match
+    case Version.Stable(m, n) => s"$m.$n"
+    case Version.Legacy => "legacy"

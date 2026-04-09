@@ -936,10 +936,12 @@ object SpaceEngine {
    *       ^ pat    ^ selector
    *
    */
-  private def selectorIsBoundVar(selector: Tree, pat: Tree)(using Context): Boolean =
-    pat match
-      case b: Bind => selector.symbol == b.symbol
-      case _ => false
+  private object SelectorBoundVar:
+    def unapply(args: (Tree, Tree))(using Context): Boolean =
+      val (selector, pat) = args
+      pat match
+        case b: Bind => selector.symbol == b.symbol
+        case _       => false
 
   /** Find the index of the parameter in an outer UnApply pattern that directly binds the selector symbol.
    *
@@ -947,35 +949,71 @@ object SpaceEngine {
    *               ^ returns Some(0)
    *
    */
-  private def selectorParamIndex(selector: Tree, pat: Tree)(using Context): Option[Int] =
-    unbind(pat) match
-      case UnApply(_, _, pats) =>
-        val idx = pats.indexWhere {
-          case b: Bind => b.symbol == selector.symbol
-          case _ => false
-        }
-        if idx >= 0 then Some(idx) else None
+  private object SelectorParamIndex:
+    def unapply(args: (Tree, Tree))(using Context): Option[Int] =
+      val (selector, pat) = args
+      unbind(pat) match
+        case UnApply(_, _, pats) =>
+          val idx = pats.indexWhere {
+            case b: Bind => b.symbol == selector.symbol
+            case _ => false
+          }
+          Option.when(idx >= 0)(idx)
+        case _ => None
+
+  /** Find the constructor parameter index corresponding to a field access on the outer pattern's bound var.
+   *
+   *  case x if x.version match     -- returns Some(1) for Document(title, version)
+   *            ^^^^^^^^^ selector
+   *
+   */
+  private object SelectorFieldIndex:
+    def unapply(args: (Tree, Tree))(using Context): Option[Int] =
+      args match
+        case (Select(qual, fieldName), b: Bind) if b.symbol == qual.symbol =>
+          val cls = toUnderlying(qual.tpe).classSymbol
+          if cls.is(CaseClass) && !cls.isOneOf(AbstractOrTrait) then
+            val idx = cls.caseAccessors.indexWhere(_.name == fieldName)
+            Option.when(idx >= 0)(idx)
+          else None
+        case _ => None
+
+  private def narrowProdParam(patSpace: Space, idx: Int, subSpace: Space)(using Context): Option[Space] =
+    def narrow(prod: Prod): Option[Space] =
+      val Prod(tp, unappTp, params) = prod
+      if idx >= params.length then None
+      else
+        val narrowedParam = simplify(intersect(params(idx), subSpace))
+        Some(simplify(Prod(tp, unappTp, params.updated(idx, narrowedParam))))
+    patSpace match
+      case prod @ Prod(tp, unappTp1, _) =>
+        expandCaseClass(tp) match
+          case null => None
+          case Prod(_, unappTp2, _) if isSameUnapply(unappTp1, unappTp2) => narrow(prod)
+      case Typ(tp, _) =>
+        expandCaseClass(tp) match
+          case null    => None
+          case prod    => narrow(prod)
       case _ => None
 
   private def projectSubMatch(pat: Tree, sm: SubMatch)(using Context): Option[Space] =
     val Match(selector, cases) = sm
 
     val subSpace = Or(cases.map(projectCaseDef))
+    if simplify(subSpace) == Empty then return None  // all sub-cases are guarded or empty; treat outer case as partial
     def selTyp = toUnderlying(selector.tpe)
     def patSpace = project(pat)
 
-    if selectorIsBoundVar(selector, pat) then
-      Some(simplify(intersect(patSpace, subSpace)))
-    else selectorParamIndex(selector, pat) match
-      case Some(idx) =>
-        patSpace match
-          case Prod(tp, unappTp, params) =>
-            val narrowedParam = simplify(intersect(params(idx), subSpace))
-            Some(simplify(Prod(tp, unappTp, params.updated(idx, narrowedParam))))
-          case _ => None
-      case None =>
-        if simplify(minus(project(selTyp), subSpace)) == Empty then Some(patSpace)
-        else None
+    (selector, pat) match
+      case SelectorBoundVar()      =>
+        Some(simplify(intersect(patSpace, subSpace)))
+      case SelectorParamIndex(idx) =>
+        narrowProdParam(patSpace, idx, subSpace)
+      case SelectorFieldIndex(idx) =>
+        narrowProdParam(patSpace, idx, subSpace)
+      case _ if simplify(minus(project(selTyp), subSpace)) == Empty =>
+        Some(patSpace)
+      case _ => None
 
   /** Resolve the space covered by a case and whether it may be partial.
    *  @return (space, maybePartial) where maybePartial is true when the case

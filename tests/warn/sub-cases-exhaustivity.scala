@@ -53,3 +53,32 @@ def testAlternativeMissing(c: Color): String =
   c match // warn: match may not be exhaustive: It would fail on pattern case: Color.Blue
     case c1 if c1 match
       case Color.Red | Color.Green => "warm"
+
+sealed trait Shape
+case class Circle(r: Double) extends Shape
+case class Rectangle(w: Double, h: Double) extends Shape
+
+def tupleFirstMissing(pair: (Color, Color)): String = pair match // warn
+  case (a, b) if a match
+    case Color.Red   => "red first"
+    case Color.Green => "green first"
+
+def tupleSecondMissing(pair: (Color, Color)): String = pair match // warn
+  case (a, b) if b match
+    case Color.Red   => "red second"
+    case Color.Green => "green second"
+
+def typedGuardedSubcases(s: Shape): String = s match // warn
+  case x: Circle if x match
+    case Circle(r) if r > 0 => "positive circle"
+  case _: Rectangle => "rectangle"
+
+enum Version:
+  case Legacy
+  case Stable(major: Int, minor: Int)
+
+case class Document(title: String, version: Version)
+
+def fieldAccessMissing(d: Document): String = d match // warn
+  case x if x.version match
+    case Version.Stable(m, n) => s"$m.$n"

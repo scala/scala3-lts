@@ -48,3 +48,22 @@ def testAlternativeReachability(c: Color): String = c match
   case c1 if c1 match
     case Color.Red | Color.Green | Color.Blue => "all"
   case Color.Red => "unreachable" // warn
+
+enum Version:
+  case Legacy
+  case Stable(major: Int, minor: Int)
+
+case class Document(title: String, version: Version)
+
+def tupleFirstReachability(pair: (Color, Color)): String = pair match
+  case (a, b) if a match
+    case Color.Red   => "red first"
+    case Color.Green => "green first"
+    case Color.Blue  => "blue first"
+  case (Color.Red, _) => "unreachable" // warn
+
+def fieldAccessReachability(d: Document): String = d match
+  case x if x.version match
+    case Version.Stable(m, n) => s"$m.$n"
+    case Version.Legacy => "legacy"
+  case Document(_, Version.Legacy) => "unreachable" // warn
