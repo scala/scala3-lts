@@ -990,6 +990,7 @@ object SpaceEngine {
         expandCaseClass(tp) match
           case null => None
           case Prod(_, unappTp2, _) if isSameUnapply(unappTp1, unappTp2) => narrow(prod)
+          case _ => None
       case Typ(tp, _) =>
         expandCaseClass(tp) match
           case null    => None
