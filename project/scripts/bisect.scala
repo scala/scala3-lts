@@ -1,3 +1,4 @@
+//> using jvm 8 // Maximal JDK version which can be used with all Scala 3 versions, can be overriden via command line arguments '--jvm=21'
 /*
 This script will bisect a problem with the compiler based on success/failure of the validation script passed as an argument.
 It starts with a fast bisection on released nightly builds.
@@ -38,9 +39,9 @@ val usageMessage = """
   |* --releases <releases-range>
   |    Bisect only releases from the given range (defaults to all releases).
   |    The range format is <first>...<last>, where both <first> and <last> are optional, e.g.
-  |    * 3.1.0-RC1-bin-20210827-427d313-NIGHTLY..3.2.1-RC1-bin-20220716-bb9c8ff-NIGHTLY
-  |    * 3.2.1-RC1-bin-20220620-de3a82c-NIGHTLY..
-  |    * ..3.3.0-RC1-bin-20221124-e25362d-NIGHTLY
+  |    * 3.1.0-RC1-bin-20210827-427d313-NIGHTLY...3.2.1-RC1-bin-20220716-bb9c8ff-NIGHTLY
+  |    * 3.2.1-RC1-bin-20220620-de3a82c-NIGHTLY...
+  |    * ...3.3.0-RC1-bin-20221124-e25362d-NIGHTLY
   |    The ranges are treated as inclusive.
   |
   |* --bootstrapped
@@ -131,6 +132,7 @@ object ValidationScript:
 
   def tmpScalaCliScript(command: String, args: Seq[String]): File = tmpScript(s"""
     |#!/usr/bin/env bash
+    |export JAVA_HOME=${sys.props("java.home")}
     |scala-cli ${command} -S "$$1" --server=false ${args.mkString(" ")}
     |""".stripMargin
   )
@@ -154,7 +156,7 @@ case class ReleasesRange(first: Option[String], last: Option[String]):
   def filter(releases: Seq[Release]) =
     def releaseIndex(version: String): Int =
       val index = releases.indexWhere(_.version == version)
-      assert(index > 0, s"${version} matches no nightly compiler release")
+      assert(index >= 0, s"${version} matches no nightly compiler release")
       index
     val startIdx = first.map(releaseIndex(_)).getOrElse(0)
     val endIdx = last.map(releaseIndex(_) + 1).getOrElse(releases.length)
@@ -177,7 +179,7 @@ object Releases:
   lazy val allReleases: Vector[Release] =
     val re = raw"<version>(.+-bin-\d{8}-\w{7}-NIGHTLY)</version>".r
     val xml = io.Source.fromURL(
-      "https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/maven-metadata.xml"
+      "https://repo.scala-lang.org/artifactory/maven-nightlies/org/scala-lang/scala3-compiler_3/maven-metadata.xml"
     )
     re.findAllMatchIn(xml.mkString)
       .flatMap{ m => Option(m.group(1)).map(Release.apply) }

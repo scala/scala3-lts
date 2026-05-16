@@ -785,7 +785,13 @@ trait BCodeBodyBuilder extends BCodeSkelBuilder {
           val specificReceiver = superRef.tpe.dealias match {
             case superType: SuperType =>
               val sym = superType.supertpe.typeSymbol
-              if (sym.isClass && !isEmittedInterface(sym)) sym
+              if (sym.isClass && !isEmittedInterface(sym)) {
+                val qualSym = superQual match
+                  case qual: This => qual.symbol
+                  case _ => superQual.tpe.typeSymbol
+                val superClass = if qualSym.isClass then qualSym.asClass.superClass else NoSymbol
+                if superClass.exists && !isEmittedInterface(superClass) then superClass else null
+              }
               else null
             case _ =>
               null
