@@ -884,8 +884,43 @@ class Inliner(val call: tpd.Tree)(using Context):
     override def typedSelect(tree: untpd.Select, pt: Type)(using Context): Tree = {
       val locked = ctx.typerState.ownedVars
       val qual1 = typed(tree.qualifier, shallowSelectionProto(tree.name, pt, this, tree.nameSpan))
-      selectionType(tree, qual1) // side-effect
-      val resNoReduce = untpd.cpy.Select(tree)(qual1, tree.name).withType(tree.typeOpt)
+
+      // Make sure that the named type has the correct denotation.
+      // For instance in tests/pos/i22070 when we type `Featureful[?]#toFeatures`,
+      // `selectionType` will skolemize the prefix, find the denotation,
+      // and then set that denotation for the `TermRef(Featureful[?], symbol toFeatures)`.
+      val reselectedType = selectionType(tree, qual1)
+
+      def isConcreteImplementationOf(reselected: Symbol, overridden: Symbol)(using Context): Boolean =
+        reselected.isTerm
+        && !reselected.is(Deferred)
+        && overridden.owner.isClass
+        && reselected.overriddenSymbol(overridden.owner.asClass) == overridden
+
+      def concreteImplementation(tp: Type, overridden: Symbol)(using Context) =
+        tp match
+          case tp: NamedType =>
+            val candidates = tp.denot.alternatives.filter(alt =>
+              isConcreteImplementationOf(alt.symbol, overridden))
+            candidates match
+              case candidate :: Nil => Some(candidate)
+              case _ => None
+          case _ =>
+            None
+
+      val select = untpd.cpy.Select(tree)(qual1, tree.name)
+      val resNoReduce =
+        if tree.symbol.isAllOf(DeferredInline) && reselectedType.exists then
+          concreteImplementation(reselectedType, tree.symbol) match
+            case Some(implementation) =>
+              val implementationType = reselectedType match
+                case reselectedType: NamedType => reselectedType.prefix.select(tree.name, implementation)
+                case _ => reselectedType
+              select.withType(implementationType)
+            case None =>
+              select.withType(tree.typeOpt)
+        else
+          select.withType(tree.typeOpt)
       val reducedProjection = reducer.reduceProjection(resNoReduce)
       if reducedProjection.isType then
         //if the projection leads to a typed tree then we stop reduction
