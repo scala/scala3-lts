@@ -32,7 +32,6 @@ class PostProcessor(frontendAccess: PostProcessorFrontendAccess,
   private val inliner             = new Inliner(frontendAccess, backendUtils, callGraph, bTypeLoader, bTypesFromClassfile, byteCodeRepository, heuristics, closureOptimizer, optSettings)
   private val localOpt            = new LocalOpt(backendUtils, callGraph, inliner, bTypes, bTypesFromClassfile, optSettings)
 
-  given FileWriters.ReadOnlyContext = FileWriters.ReadOnlyContext.eager
   private val classfileWriter: FileWriters.ClassfileWriter = {
     val dumpClassesPath =
       ctx.settings.Xdumpclasses.valueSetByUser
@@ -40,7 +39,7 @@ class PostProcessor(frontendAccess: PostProcessorFrontendAccess,
         .filter(path => Files.exists(path).tap(ok => if !ok then report.error(em"Output dir does not exist: ${path.toString}")))
         .map(_.toPlainFile)
 
-    FileWriters.ClassfileWriter(ctx.settings.outputDir.value, ctx.settings.XmainClass.valueSetByUser, dumpClassesPath)
+    FileWriters.ClassfileWriter(ctx.settings.outputDir.value, ctx.settings.XmainClass.valueSetByUser, ctx.settings.XjarCompressionLevel.value, dumpClassesPath)
   }
 
   private type ClassnamePosition = (String, SourcePosition)
