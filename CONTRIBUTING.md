@@ -94,6 +94,7 @@ Principal areas of the compiler and internal team members responsible for their 
 **Tooling**
 - REPL:
 - Runner/CLI: @Gedochao, (@tgodzik)
+- Directives' Parser: @Gedochao
 - IDE: @tgodzik, @zielinsky
 - Scaladoc: (@Florian3k)
 - Bytecode Optimizer: @SolalPirelli, (@lrytz)
