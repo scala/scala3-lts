@@ -65,6 +65,11 @@ compiler/test/debug/Gen.jar
 
 compiler/before-pickling.txt
 compiler/after-pickling.txt
+/bin/.cp
+
+before-pickling.txt
+after-pickling.txt
+after-printing.txt
 bench/compile.txt
 
 community-build/scala3-bootstrapped.version
