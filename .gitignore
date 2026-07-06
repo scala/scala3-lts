@@ -63,6 +63,11 @@ testlogs/
 local/
 compiler/test/debug/Gen.jar
 
+/bin/.cp
+
+before-pickling.txt
+after-pickling.txt
+after-printing.txt
 compiler/before-pickling.txt
 compiler/after-pickling.txt
 bench/compile.txt
