@@ -1264,7 +1264,7 @@ object Build {
         `scala3-compiler-bootstrapped` / publishLocal,
         `scala3-library-bootstrapped` / publishLocal,
       ).value,
-      Compile / scalacOptions ++= Seq("-Yexplicit-nulls", "-Ysafe-init"),
+      Compile / scalacOptions ++= Seq("-Yexplicit-nulls", "-Ysafe-init", "-Wconf:src=.*/scala/meta/internal/.*:s"),
       Compile / sourceGenerators += Def.task {
         val s = streams.value
         val cacheDir = s.cacheDirectory
