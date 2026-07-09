@@ -1102,13 +1102,15 @@ class Namer { typer: Typer =>
 
     val TypeDef(name, impl @ Template(constr, _, self, _)) = original: @unchecked
 
-    private val (params, rest): (List[Tree], List[Tree]) = impl.body.span {
+    private val (params, rest) = impl.body.span {
       case td: TypeDef => td.mods.is(Param)
       case vd: ValDef => vd.mods.is(ParamAccessor)
       case _ => false
     }
 
-    def init(): Context = index(params)
+    def init(): Context = index(params.collect{
+      case tree: Tree => tree
+    })
 
     /** The forwarders defined by export `exp`
      *  @param  pathMethod  If it exists, the symbol referenced by the path of an export

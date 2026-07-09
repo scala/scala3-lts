@@ -31,7 +31,10 @@ import dotty.tools.dotc.rewrites.Rewrites.ActionPatch
 import dotty.tools.dotc.util.Spans.Span
 import dotty.tools.dotc.util.SourcePosition
 import dotty.tools.dotc.util.SourceFile
+import dotty.tools.dotc.cc.CaptureSet.IdentityCaptRefMap
 import DidYouMean.*
+import scala.util.matching.Regex
+import java.util.regex.Matcher
 
 /**  Messages
   *  ========
@@ -2976,7 +2979,7 @@ class MissingImplicitArgument(
       val idx = paramNames.indexOf(name)
       if (idx >= 0) Some(i"${args(idx)}") else None
     """\$\{\s*([^}\s]+)\s*\}""".r.replaceAllIn(raw, (_: Regex.Match) match
-      case Regex.Groups(v) => quoteReplacement(translate(v).getOrElse("?" + v)).nn
+      case Regex.Groups(v) => Matcher.quoteReplacement(translate(v).getOrElse("?" + v)).nn
     )
 
   /** @param rawMsg           Message template with variables, e.g. "Variable A is ${A}"
