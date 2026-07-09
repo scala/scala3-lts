@@ -147,6 +147,11 @@ object projects:
       s""";set $project/Compile/doc/sources ++= ($project/Compile/doc/dotty.tools.sbtplugin.DottyPlugin.autoImport.tastyFiles).value ;$project/doc"""
     ).mkString(" ")
 
+  private def removeRelease8(projects: String*): String =
+    projects.map(project =>
+      s"""set $project/Compile/scalacOptions := ($project/Compile/scalacOptions).value.filterNot(opt => opt == "-release" || opt == "-java-output-version" || opt == "8")"""
+    ).mkString("; ")
+
   private def aggregateDoc(in: String)(projects: String*) =
     val tastyFiles =
       (in +: projects).map(p => s"($p/Compile/doc/dotty.tools.sbtplugin.DottyPlugin.autoImport.tastyFiles).value").mkString(" ++ ")
