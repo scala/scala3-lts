@@ -334,6 +334,10 @@ class InstrumentCoverage extends MacroTransform with IdentityDenotTransformer:
         val coverageCall = createInvokeCall(tree, tree.sourcePos, branch = true)
         InstrumentedParts.singleExprTree(coverageCall, transformed)
 
+    private def transformCondition(tree: Tree)(using Context): Tree = tree match
+      case Literal(Constant(_: Boolean)) => tree
+      case _ => transform(tree)
+
     override def transform(tree: Tree)(using Context): Tree =
       inContext(transformCtx(tree)) { // necessary to position inlined code properly
         tree match
