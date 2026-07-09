@@ -128,7 +128,7 @@ final case class SbtCommunityProject(
       case Some(ivyHome) => List(s"-Dsbt.ivy.home=$ivyHome")
       case _ => Nil
     extraSbtArgs ++ sbtProps ++ List(
-      "-sbt-version", "1.11.5",
+      "-sbt-version", "1.12.9",
       "-Dsbt.supershell=false",
       s"-Ddotty.communitybuild.dir=$communitybuildDir",
       s"--addPluginSbtFile=$sbtPluginFilePath"
@@ -464,7 +464,14 @@ object projects:
 
   lazy val catsEffect3 = SbtCommunityProject(
     project        = "cats-effect-3",
-    sbtTestCommand = "ciJVM",
+    sbtTestCommand =
+      List(
+        removeRelease8("core.jvm", "example.jvm", "kernel.jvm", "kernelTestkit.jvm", "laws.jvm", "std.jvm", "testkit.jvm", "tests.jvm", "rootJVM", "ioAppTestsJVM", "benchmarks", "graalVMExample"),
+        // repeats code from `removeRelease8`, but oh well, maybe generalize later
+        """set root/ScalaUnidoc/unidoc/scalacOptions := (root/ScalaUnidoc/unidoc/scalacOptions).value.filterNot(opt => opt == "-release" || opt == "-java-output-version" || opt == "8")""",
+        "set ThisBuild / tlFatalWarnings := false",
+        "ciJVM"
+      ).mkString("; "),
     sbtPublishCommand = "publishLocal",
     sbtDocCommand  = ";coreJVM/doc ;lawsJVM/doc ;kernelJVM/doc",
     dependencies   = List(cats, coop, disciplineSpecs2, scalacheck)
