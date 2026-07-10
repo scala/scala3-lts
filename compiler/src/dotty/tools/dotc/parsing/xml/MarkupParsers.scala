@@ -77,9 +77,8 @@ object MarkupParsers {
 
     import parser.{ symbXMLBuilder => handle }
 
-    def curOffset: Int = input.lastCharOffset
-
-    var tmppos: Span = NoSpan
+    def curOffset : Int = input.charOffset - 1
+    var tmppos : Span = NoSpan
     def ch: Char = input.ch
     /** this method assign the next character to ch and advances in input */
     def nextch(): Unit = { input.nextChar() }
@@ -170,8 +169,10 @@ object MarkupParsers {
       xTakeUntil(handle.charData, () => Span(start, curOffset, mid), "]]>")
     }
 
-    def xUnparsed(start: Int): Tree =
+    def xUnparsed: Tree = {
+      val start = curOffset
       xTakeUntil(handle.unparsed, () => Span(start, curOffset, start), "</xml:unparsed>")
+    }
 
     /** Comment ::= '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'
      *
@@ -275,7 +276,7 @@ object MarkupParsers {
      *                | xmlTag1 '/' '>'
      */
     def element: Tree = {
-      val start = curOffset - 1 // include <
+      val start = curOffset
       val (qname, attrMap) = xTag(())
       if (ch == '/') { // empty element
         xToken("/>")
@@ -284,7 +285,7 @@ object MarkupParsers {
       else { // handle content
         xToken('>')
         if (qname == "xml:unparsed")
-          return xUnparsed(start)
+          return xUnparsed
 
         debugLastStartElement = (start, qname) :: debugLastStartElement
         val ts = content
@@ -362,7 +363,7 @@ object MarkupParsers {
         handle.isPattern = false
 
         val ts = new ArrayBuffer[Tree]
-        val start = curOffset - 1 // include <, start == parser.in.offset
+        val start = curOffset
         tmppos = Span(curOffset)    // Iuli: added this line, as it seems content_LT uses tmppos when creating trees
         content_LT(ts)
 
@@ -433,7 +434,7 @@ object MarkupParsers {
      *                  | Name [S] '/' '>'
      */
     def xPattern: Tree = {
-      val start = curOffset - 1 // include <
+      var start = curOffset
       val qname = xName
       debugLastStartElement = (start, qname) :: debugLastStartElement
       xSpaceOpt()
