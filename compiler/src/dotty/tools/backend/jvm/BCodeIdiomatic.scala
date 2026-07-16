@@ -533,7 +533,7 @@ trait BCodeIdiomatic {
 
     // can-multi-thread
     final def checkCast(tk: RefBType): Unit = {
-      // TODO ICode also requires: but that's too much, right? assert(!isBoxedType(tk),     "checkcast on boxed type: " + tk)
+      // TODO ICode also requires: but that's too much, right? assert(!isBoxed(tk),     "checkcast on boxed type: " + tk)
       jmethod.visitTypeInsn(Opcodes.CHECKCAST, tk.classOrArrayType)
     }
 
