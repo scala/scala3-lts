@@ -19,6 +19,7 @@ import printing.Formatting.hl
 import config.Printers
 import parsing.Parsers
 import util.chaining.*
+import collection.immutable.BitSet
 
 import scala.annotation.{unchecked as _, *}, internal.sharable
 
@@ -766,6 +767,16 @@ object desugar {
           else derivedTermParam(vparam)
         derived.withAnnotations(Nil)
 
+    val consumeParamPositions =
+      constrVparamss.head.zipWithIndex.collect:
+          case (param, idx) if param.mods.annotations.exists(isConsumeAnnot(_)) => idx
+        .to(BitSet)
+
+    extension [T <: untpd.DefTree](t: T) def withConsumeIf(cond: Boolean): T =
+      if cond
+      then t.withAddedAnnotation(makeConsumeAnnot().withSpan(t.span)).asInstanceOf[T]
+      else t
+
     val constr = cpy.DefDef(constr1)(paramss = joinParams(constrTparams, constrVparamss))
       .withMods(addImplUse(constr1.mods, initially = true))
 
@@ -907,9 +918,6 @@ object desugar {
     //     def copy(p1: T1 = p1..., pN: TN = pN)(moreParams) =
     //       new C[...](p1, ..., pN)(moreParams)
     val (caseClassMeths, enumScaffolding) = {
-      def syntheticProperty(name: TermName, tpt: Tree, rhs: Tree) =
-        DefDef(name, Nil, tpt, rhs).withMods(synthetic)
-
       def productElemMeths =
         if caseClassInScala2Library then Nil
         else
@@ -923,8 +931,11 @@ object desugar {
           for i <- List.range(0, arity)
               selName = nme.selectorName(i)
               if (selName ne caseParams(i).name) && !selectorNamesInBody.contains(selName)
-          yield syntheticProperty(selName, caseParams(i).tpt,
-            Select(This(EmptyTypeIdent), caseParams(i).name))
+          yield
+            DefDef(selName, Nil, caseParams(i).tpt,
+              Select(This(EmptyTypeIdent), caseParams(i).name))
+                .withMods(synthetic)
+                .withConsumeIf(consumeParamPositions.contains(i))
 
       def enumCaseMeths =
         if isEnumCase then
@@ -937,8 +948,9 @@ object desugar {
         }
         if (mods.is(Abstract) || hasRepeatedParam) Nil  // cannot have default arguments for repeated parameters, hence copy method is not issued
         else {
-          val copyFirstParams = derivedVparamss.head.map(vparam =>
-            cpy.ValDef(vparam)(rhs = refOfDef(vparam)))
+          val copyFirstParams = derivedVparamss.head.zipWithIndex.map: (vparam, idx) =>
+            cpy.ValDef(vparam)(rhs = refOfDef(vparam))
+              .withConsumeIf(consumeParamPositions.contains(idx))
           val copyRestParamss = derivedVparamss.tail.nestedMap(vparam =>
             cpy.ValDef(vparam)(rhs = EmptyTree))
           var flags = Synthetic | constr1.mods.flags & copiedAccessFlags
@@ -947,8 +959,10 @@ object desugar {
             nme.copy,
             joinParams(derivedTparams, copyFirstParams :: copyRestParamss),
             TypeTree(),
-            creatorExpr
-          ).withMods(Modifiers(flags, constr1.mods.privateWithin)) :: Nil
+            creatorExpr)
+          .withMods(Modifiers(flags, constr1.mods.privateWithin))
+          .withConsumeIf(consumeParamPositions.nonEmpty)
+          :: Nil
         }
       }
 
@@ -1006,8 +1020,9 @@ object desugar {
               if Feature.shouldBehaveAsScala2 then flags &~= Private
               Modifiers(flags).withPrivateWithin(constr1.mods.privateWithin)
             val appParamss =
-              derivedVparamss.nestedZipWithConserve(constrVparamss)((ap, cp) =>
-                ap.withMods(ap.mods | (cp.mods.flags & HasDefault)))
+              derivedVparamss.nestedZipWithConserve(constrVparamss):(ap, cp) =>
+                ap.withMods(ap.mods | (cp.mods.flags & HasDefault))
+                  .withConsumeIf(cp.mods.annotations.exists(isConsumeAnnot(_)))
             DefDef(nme.apply, joinParams(derivedTparams, appParamss), TypeTree(), creatorExpr)
               .withMods(appMods) :: Nil
           }
@@ -1027,6 +1042,7 @@ object desugar {
           }
           val methName = if (hasRepeatedParam) nme.unapplySeq else nme.unapply
           val unapplyParam = makeSyntheticParameter(tpt = classTypeRef)
+            .withConsumeIf(consumeParamPositions.nonEmpty)
           val unapplyRHS =
             if (arity == 0) Literal(Constant(true))
             else if caseClassInScala2Library then scala2LibCompatUnapplyRhs(unapplyParam.name)
