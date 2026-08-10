@@ -1366,13 +1366,16 @@ object Parsers {
       }
     }
 
+    private val interpolatorsFromAny = Set(nme.toString_, nme.hashCode_, nme.getClass_, nme.synchronized_, nme.eq, nme.ne)
+
     private def interpolatedString(inPattern: Boolean = false): Tree = atSpan(in.offset) {
       val segmentBuf = new ListBuffer[Tree]
-      val interpolator = in.name
+      val interpolator = in.name.nn
+      val startOffset = in.charOffset
       val isTripleQuoted =
-        in.charOffset + 1 < in.buf.length &&
-        in.buf(in.charOffset) == '"' &&
-        in.buf(in.charOffset + 1) == '"'
+        startOffset + 1 < in.buf.length &&
+        in.buf(startOffset) == '"' &&
+        in.buf(startOffset + 1) == '"'
       in.nextToken()
       def nextSegment(literalOffset: Offset) =
         segmentBuf += Thicket(
@@ -1404,6 +1407,8 @@ object Parsers {
       if (in.token == STRINGLIT)
         segmentBuf += literal(in.offset + offsetCorrection, inPattern = inPattern, inStringInterpolation = true)
 
+      if interpolatorsFromAny(interpolator) then
+        report.warning(UseOfAnyMethodAsInterpolator(interpolator), source.atSpan(Span(startOffset, in.charOffset)))
       InterpolatedString(interpolator, segmentBuf.toList)
     }
 
