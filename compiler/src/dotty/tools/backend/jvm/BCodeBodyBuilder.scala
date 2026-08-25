@@ -1752,8 +1752,12 @@ trait BCodeBodyBuilder extends BCodeSkelBuilder {
       report.debuglog(s"Using invokedynamic rather than `new ${ctor.owner}`")
       val generatedType = classBTypeFromSymbol(functionalInterface)
       // Lambdas should be serializable if they implement a SAM that extends Serializable or if they
-      // implement a scala.Function* class.
-      val isSerializable = functionalInterface.isSerializable || defn.isFunctionClass(functionalInterface)
+      // implement a scala.Function* class. FunctionXXL is named separately because it lives in
+      // scala.runtime, which isFunctionClass does not look in.
+      val isSerializable =
+        functionalInterface.isSerializable
+        || defn.isFunctionClass(functionalInterface)
+        || functionalInterface == defn.FunctionXXLClass
       val isInterface = isEmittedInterface(lambdaTarget.owner)
       val invokeStyle =
         if (lambdaTarget.isStaticMember) asm.Opcodes.H_INVOKESTATIC
