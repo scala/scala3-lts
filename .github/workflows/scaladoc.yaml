@@ -68,6 +68,10 @@ jobs:
 
   validate-docs:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || (
+          !contains(github.event.pull_request.body, '[skip ci]')
+          && !contains(github.event.pull_request.body, '[skip docs]')
+        )
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -81,6 +85,10 @@ jobs:
   validate-generated-docs:
     needs: build
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || (
+          !contains(github.event.pull_request.body, '[skip ci]')
+          && !contains(github.event.pull_request.body, '[skip docs]')
+        )
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -145,6 +153,10 @@ jobs:
 
   check-error-code-snippets:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || (
+          !contains(github.event.pull_request.body, '[skip ci]')
+          && !contains(github.event.pull_request.body, '[skip docs]')
+        )
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: coursier/cache-action@95e5b1029b6b86e7bac033ee44a0697d8a527d2d # v8.1.1
