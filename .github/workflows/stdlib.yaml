@@ -18,6 +18,7 @@ jobs:
   test-scala-library-nonbootstrapped:
     name: Non-Bootstrapped Library Unit Tests
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
@@ -31,6 +32,7 @@ jobs:
   test-scala-library-bootstrapped:
     name: Bootstrapped Library Unit Tests
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
@@ -65,6 +67,7 @@ jobs:
 
   mima-scala3-interfaces:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -82,6 +85,7 @@ jobs:
 
   mima-tasty-core-nonbootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -99,6 +103,7 @@ jobs:
 
   static-analysis-scala-library-bootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -119,6 +124,7 @@ jobs:
 
   mima-tasty-core-bootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -136,6 +142,7 @@ jobs:
 
   mima-scala-library-sjs:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -157,6 +164,7 @@ jobs:
 
   test-scala3-compiler-nonbootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -180,6 +188,7 @@ jobs:
 
   test-scala3-compiler-bootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -203,6 +212,7 @@ jobs:
 
   test-scala3-bootstrapped-compilation-coverage:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -219,6 +229,7 @@ jobs:
 
   test-scala3-sbt-bridge-nonbootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -235,6 +246,7 @@ jobs:
 
   test-scala3-sbt-bridge-bootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -251,6 +263,7 @@ jobs:
 
   test-tasty-core-nonbootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -267,6 +280,7 @@ jobs:
 
   test-tasty-core-bootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -283,6 +297,7 @@ jobs:
 
   test-scala3-directives-parser-nonbootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v7
@@ -298,6 +313,7 @@ jobs:
 
   test-scala3-directives-parser-bootstrapped:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v7
@@ -313,6 +329,7 @@ jobs:
 
   test-scala-js:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -341,6 +358,7 @@ jobs:
 
   test-repl:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -357,6 +375,7 @@ jobs:
 
   test-repl-jdk:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     strategy:
       fail-fast: false
       matrix:
@@ -384,6 +403,7 @@ jobs:
 
   test-presentation-compiler:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -400,6 +420,7 @@ jobs:
 
   test-language-server:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -416,6 +437,7 @@ jobs:
 
   scripted-tests:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -432,6 +454,7 @@ jobs:
 
   community_build_a:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Checkout cleanup script
         uses: actions/checkout@v6
@@ -450,6 +473,7 @@ jobs:
 
   community_build_b:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Checkout cleanup script
         uses: actions/checkout@v6
@@ -469,6 +493,7 @@ jobs:
 
   community_build_c:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Checkout cleanup script
         uses: actions/checkout@v6
@@ -491,6 +516,7 @@ jobs:
 
   scala-library-docs:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6

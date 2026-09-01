@@ -393,6 +393,7 @@ jobs:
 
   scalafmt:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.body, '[skip ci]')
     steps:
       - uses: actions/checkout@v6
         with:
