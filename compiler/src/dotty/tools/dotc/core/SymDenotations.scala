@@ -863,7 +863,13 @@ object SymDenotations {
      *  but it becomes nullable after erasure.
      */
     final def isNullableClassAfterErasure(using Context): Boolean =
-      isClass && !isValueClass && !is(ModuleClass) && symbol != defn.NothingClass
+      // `Null` derives from `AnyVal` under explicit nulls, so it would be excluded by
+      // `!isValueClass`, even though `null` is of course a value of it.
+      isClass && {
+        if isValueClass then
+          symbol == defn.NullClass || ctx.explicitNulls && symbol == defn.AnyValClass
+        else !is(ModuleClass) && symbol != defn.NothingClass
+      }
 
     /** Is this definition accessible as a member of tree with type `pre`?
      *  @param pre          The type of the tree from which the selection is made
