@@ -34,6 +34,9 @@ object Versions {
   */
   val baseVersion = s"$developedVersion-RC1"
 
+  // LTS or Next — must be defined before checkReleasedTastyVersion() runs below
+  val versionLine = "LTS"
+
   /** The version of TASTY that should be emitted, checked in runtime test
    *  For details on how TASTY version should be set see related discussions:
    *    - https://github.com/scala/scala3/issues/13447#issuecomment-912447107
@@ -44,9 +47,11 @@ object Versions {
    *    - Major version is always 28
    *    - TASTY minor version:
    *      - in main (NIGHTLY): {if $patch == 0 || ${referenceVersion.matches(raw"3.$minor.0-RC\d")} then $minor else ${minor + 1}}
+   *      - in LTS branch (NIGHTLY): always equal to $minor
    *      - in release branch is always equal to $minor
    *    - TASTY experimental version:
    *      - in main (NIGHTLY) is always experimental
+   *      - in LTS branch (NIGHTLY): always non-experimental
    *      - in release candidate branch is experimental if {patch == 0}
    *      - in stable release is always non-experimental
    */
@@ -77,9 +82,6 @@ object Versions {
     dottyVersion + bin + "-nonbootstrapped"
   }
 
-  // LTS or Next
-  val versionLine = "LTS"
-
   /** Minor version against which we check binary compatibility.
    *
    *  This must be the earliest published release in the same versioning line.
@@ -105,8 +107,10 @@ object Versions {
       case other => sys.error(s"Invalid TASTy version string: $expectedTastyVersion")
     }
 
+    val isLTS = versionLine == "LTS"
+
     if(isNightly) {
-      assert(tastyIsExperimental, "TASTY needs to be experimental in nightly builds")
+      assert(tastyIsExperimental || isLTS, "TASTY needs to be experimental in nightly builds")
       val expectedTastyMinor = version.patch match {
         case 0 => version.minor
         case 1 if referenceV.patch == 0 && referenceV.isRC =>
@@ -114,9 +118,11 @@ object Versions {
           // Needed for non_bootstrapped tests requiring either stable tasty or the same experimental version produced by both reference and bootstrapped compiler
           assert(version.minor == referenceV.minor, "Expected reference and base version to use the same minor")
           version.minor
-        case _ => version.minor + 1
+        case _ =>
+          if (isLTS) version.minor
+          else version.minor + 1
       }
-      assert(tastyMinor == expectedTastyMinor, "Invalid TASTy minor version")
+      assert(tastyMinor == expectedTastyMinor, s"Invalid TASTy minor version, expected $expectedTastyMinor, got $tastyMinor")
     }
 
     if(isRelease) {
