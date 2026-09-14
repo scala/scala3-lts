@@ -106,7 +106,8 @@ object Versions {
     }
 
     if(isNightly) {
-      assert(tastyIsExperimental, "TASTY needs to be experimental in nightly builds")
+      if (version.minor == 9)
+        assert(!tastyIsExperimental, "3.9 LTS TASTY cannot be experimental in nightly builds")
       val expectedTastyMinor = version.patch match {
         case 0 => version.minor
         case 1 if referenceV.patch == 0 && referenceV.isRC =>
