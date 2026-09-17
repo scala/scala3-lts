@@ -105,6 +105,8 @@ object Versions {
       case other => sys.error(s"Invalid TASTy version string: $expectedTastyVersion")
     }
 
+    val isLTS = versionLine == "LTS"
+
     if(isNightly) {
       if (version.minor == 9)
         assert(!tastyIsExperimental, "3.9 LTS TASTY cannot be experimental in nightly builds")
@@ -115,9 +117,10 @@ object Versions {
           // Needed for non_bootstrapped tests requiring either stable tasty or the same experimental version produced by both reference and bootstrapped compiler
           assert(version.minor == referenceV.minor, "Expected reference and base version to use the same minor")
           version.minor
+        case _ if isLTS => version.minor
         case _ => version.minor + 1
       }
-      assert(tastyMinor == expectedTastyMinor, "Invalid TASTy minor version")
+      assert(tastyMinor == expectedTastyMinor, s"Invalid TASTy minor version, expected $expectedTastyMinor, got $tastyMinor")
     }
 
     if(isRelease) {
