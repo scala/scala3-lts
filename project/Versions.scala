@@ -51,6 +51,10 @@ object Versions {
    *      - in stable release is always non-experimental
    */
   val expectedTastyVersion = "28.9"
+
+  // LTS or Next
+  val versionLine = "LTS"
+
   checkReleasedTastyVersion()
 
   /** Final version of Scala compiler, controlled by environment variables. */
@@ -76,9 +80,6 @@ object Versions {
     val bin = if (!dottyVersion.contains("-bin")) "-bin" else ""
     dottyVersion + bin + "-nonbootstrapped"
   }
-
-  // LTS or Next
-  val versionLine = "LTS"
 
   /** Minor version against which we check binary compatibility.
    *
