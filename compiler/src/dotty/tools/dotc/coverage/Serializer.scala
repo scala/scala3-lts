@@ -99,12 +99,12 @@ object Serializer:
   def deserialize(lines: Iterator[String], sourceRoot: Path): Coverage =
     def toStatement(lines: Iterator[String]): Statement =
       val id: Int = lines.next().toInt
-      val sourcePath = lines.next()
-      val packageName = lines.next()
-      val className = lines.next()
+      val sourcePath = lines.next().unescaped
+      val packageName = lines.next().unescaped
+      val className = lines.next().unescaped
       val classType = lines.next()
-      val fullClassName = lines.next()
-      val method = lines.next()
+      val fullClassName = lines.next().unescaped
+      val method = lines.next().unescaped
       val loc = Location(
         packageName,
         className,
@@ -116,12 +116,12 @@ object Serializer:
       val start: Int = lines.next().toInt
       val end: Int = lines.next().toInt
       val lineNo: Int = lines.next().toInt
-      val symbolName: String = lines.next()
+      val symbolName: String = lines.next().unescaped
       val treeName: String = lines.next()
       val branch: Boolean = lines.next().toBoolean
       val count: Int = lines.next().toInt
       val ignored: Boolean = lines.next().toBoolean
-      val desc = lines.toList.mkString("\n")
+      val desc = lines.map(_.unescaped).toList.mkString("\n")
       Statement(
         loc,
         id,
@@ -152,7 +152,7 @@ object Serializer:
   /** Makes a String suitable for output in the coverage statement data as a single line.
    * Escaped characters: '\\' (backslash), '\n', '\r', '\f'
    */
-  extension (str: String) def escaped: String =
+  extension (str: String) private def escaped: String =
     val builder = StringBuilder(str.length)
     var i = 0
     while
@@ -168,6 +168,40 @@ object Serializer:
         case '\f' =>
           builder ++= "\\f"
         case c =>
+          builder += c
+      i += 1
+    end while
+    builder.result()
+
+
+  /** Reverses `escaped`
+   */
+  extension (str: String) private def unescaped: String =
+    val builder = StringBuilder(str.length)
+    var isEscape = false
+    var i = 0
+    while
+      i < str.length
+    do
+      val c = str.charAt(i)
+      if isEscape then
+        isEscape = false
+        c match
+          case '\\'  =>
+            builder ++= "\\"
+          case 'n' =>
+            builder ++= "\n"
+          case 'r' =>
+            builder ++= "\r"
+          case 'f' =>
+            builder ++= "\f"
+          case _ =>
+            builder += c
+      else
+        if c == '\\' then
+          isEscape = true
+        else
+          isEscape = false
           builder += c
       i += 1
     end while
