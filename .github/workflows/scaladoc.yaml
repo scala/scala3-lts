@@ -5,6 +5,7 @@ on:
     branches-ignore:
       - 'language-reference-stable'
       - 'gh-readonly-queue/**'
+      - 'backport**'
   pull_request:
     branches-ignore:
       - 'language-reference-stable'
