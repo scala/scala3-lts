@@ -34,7 +34,7 @@ jobs:
       universal-digest : ${{ steps.universal-digest.outputs.digest }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
