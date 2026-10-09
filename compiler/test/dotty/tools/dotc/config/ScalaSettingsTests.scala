@@ -318,6 +318,22 @@ class ScalaSettingsTests:
     assertEquals("Option -Xfatal-warnings is a deprecated alias: use -Werror instead", result.warnings.head)
     assertEquals(0, result.errors.length)
 
+  @Test def `deprecated -language fewerBraces warns with option name when -deprecation is on`: Unit =
+    val rep = new StoreReporter()
+    val base = new ContextBase {}
+    given Context = base.initialCtx.fresh
+      .setReporter(rep)
+      .setSetting(ScalaSettings.classpath, TestConfiguration.basicClasspath)
+      .setSetting(ScalaSettings.language, List("experimental.fewerBraces").asInstanceOf)
+      .setSetting(ScalaSettings.deprecation, true)
+    base.initialize()(using summon[Context])
+    Feature.checkDeprecatedSettingFeatures
+    assertEquals(1, rep.warningCount)
+    assertEquals(
+      "Option -language:experimental.fewerBraces is deprecated: `fewerBraces` is now standard, no language import is needed",
+      rep.removeBufferedMessages.head.message,
+    )
+
   // see sbt-test/pipelining/pipelining-test/test
   @Test def `-Xearly-tasty-output preferPrevious does not warn on change of value`: Unit =
     val settings = ScalaSettings
