@@ -21,9 +21,8 @@ extension [R1] (g1: Parser[R1] )
 
 object ParserFlatMapOp {
 
-  given given_ISpcNdInvariant_PModAllocatedNodeTypeFamily
-  : (x: AllocatedNodeTypeFamily ) => (ISpcNdInvariant { type SpcNdObj = x.Node })
-  = new ISpcNdInvariant {}.asInstanceOf
+  given given_ISpcNdInvariant_PModAllocatedNodeTypeFamily(using x: AllocatedNodeTypeFamily): (ISpcNdInvariant { type SpcNdObj = x.Node }) =
+    new ISpcNdInvariant {}.asInstanceOf
 
   trait ISpcNdInvariant :
     type SpcNdObj

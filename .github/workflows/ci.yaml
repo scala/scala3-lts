@@ -84,13 +84,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -137,13 +137,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -180,7 +180,7 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Test
         run: sbt ";scala3-bootstrapped/compile; scala3-bootstrapped/testCompilation; scala3-presentation-compiler/test; scala3-language-server/test"
@@ -224,7 +224,7 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Test
         run: sbt ";dist/pack ;scala3-bootstrapped/compile ;scala3-bootstrapped/test"
@@ -266,13 +266,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -313,13 +313,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -367,13 +367,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -421,13 +421,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -474,13 +474,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -522,13 +522,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -570,13 +570,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -634,13 +634,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -689,13 +689,13 @@ jobs:
           git -c "http.https://github.com/.extraheader=" fetch --recurse-submodules=no "https://github.com/scala/scala3" && git reset --hard FETCH_HEAD || true
 
       - name: Checkout cleanup script
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Cleanup
         run: .github/workflows/cleanup.sh
 
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Add SBT proxy repositories
         run: cp -vf .github/workflows/repositories /root/.sbt/ ; true
@@ -758,7 +758,7 @@ jobs:
     if: "failure() && github.event_name == 'schedule'"
     steps:
       - name: Checkout issue template
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Open an issue
         uses: JasonEtco/create-an-issue@v2
@@ -796,7 +796,7 @@ jobs:
   scalafmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: coursier/cache-action@v8
