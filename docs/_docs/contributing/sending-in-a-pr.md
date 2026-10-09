@@ -159,9 +159,9 @@ you're PR will be merged in!
 
 [pull-request]: https://docs.github.com/en?query=pull+requests
 [lampepfl/dotty]: https://github.com/lampepfl/dotty
-[cla]: http://typesafe.com/contribute/cla/scala
-[issues]: https://github.com/lampepfl/dotty/issues
-[full-list]: https://github.com/lampepfl/dotty/blob/master/CONTRIBUTING.md
+[cla]: https://contribute.akka.io/contribute/cla/scala
+[issues]: https://github.com/scala/scala3/issues
+[full-list]: https://github.com/scala/scala3/blob/master/CONTRIBUTING.md
 [discord]: https://discord.gg/TSmY9zkHar
 [dry]: https://www.oreilly.com/library/view/97-things-every/9780596809515/ch30.html
 [scouts]: https://www.oreilly.com/library/view/97-things-every/9780596809515/ch08.html
