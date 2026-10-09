@@ -13,6 +13,7 @@ import NameKinds.QualifiedName
 import Annotations.ExperimentalAnnotation
 import Annotations.PreviewAnnotation
 import Settings.Setting.ChoiceWithHelp
+import dotty.tools.dotc.ast.untpd
 
 object Feature:
 
