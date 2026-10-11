@@ -87,8 +87,6 @@ object Feature:
   /** Features that are now standard; the language import / -language choice is
    *  still accepted but deprecated and has no effect. name -> deprecation message. */
   val deprecatedFeatures: List[(TermName, String)] = List(
-    (strictEqualityPatternMatching,
-     "`strictEqualityPatternMatching` is now standard, no language import is needed"),
     (experimental("fewerBraces"),
      "`fewerBraces` is now standard, no language import is needed"),
     (experimental("relaxedExtensionImports"),
