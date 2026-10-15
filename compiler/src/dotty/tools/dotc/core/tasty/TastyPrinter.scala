@@ -118,6 +118,8 @@ class TastyPrinter(bytes: Array[Byte]) {
         sb.append(s"\n$length:" + " " * indent)
       }
       def printNat() = sb.append(treeStr(" " + readNat()))
+      def printInt() = sb.append(treeStr(" " + readInt()))
+      def printLongInt() = sb.append(treeStr(" " + readLongInt()))
       def printName() = {
         val idx = readNat()
         sb.append(nameStr(" " + idx + " [" + nameRefToString(NameRef(idx)) + "]"))
@@ -167,6 +169,8 @@ class TastyPrinter(bytes: Array[Byte]) {
         else if (tag >= firstNatTreeTag)
           tag match {
             case TERMREFpkg | TYPEREFpkg | STRINGconst | IMPORTED => printName()
+            case BYTEconst | SHORTconst | INTconst | FLOATconst => printInt()
+            case LONGconst | DOUBLEconst => printLongInt()
             case _ => printNat()
           }
         indent -= 2
