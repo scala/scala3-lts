@@ -5,6 +5,9 @@ import CommandLineParser.tokenize
 import Settings.*
 import dotty.tools.Useables.given
 import dotty.tools.dotc.config.ScalaSettingCategories.*
+import dotty.tools.dotc.reporting.StoreReporter
+import core.Contexts.{Context, ContextBase}
+import dotty.tools.vulpix.TestConfiguration
 import org.junit.Test
 import org.junit.Assert.*
 import core.Decorators.toMessage

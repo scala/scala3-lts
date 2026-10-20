@@ -288,7 +288,7 @@ final class ClassfileParser(
   private def currentIsTopLevel(using Context) = classRoot.owner.is(Flags.PackageClass)
 
   private def mismatchError(className: SimpleName) =
-    throw new IOException(s"class file '${classfile.canonicalPath}' has location not matching its contents: contains class $className")
+    throw new IOException(s"class file '${classfile.path}' has location not matching its contents: contains class $className")
 
   def run()(using Context): Option[Embedded] = try ctx.base.reusableDataReader.withInstance { reader =>
     implicit val reader2 = reader.reset(classfile)
@@ -306,7 +306,7 @@ final class ClassfileParser(
         case _: UnpickleException => ""
         case _ => Header.Version.brokenVersionAddendum(classfileVersion)
       throw new IOException(
-        i"""  class file ${classfile.canonicalPath} is broken$addendum,
+        i"""  class file ${classfile.path} is broken$addendum,
           |  reading aborted with ${e.getClass}:
           |  ${Option(e.getMessage).getOrElse("")}""")
   }
