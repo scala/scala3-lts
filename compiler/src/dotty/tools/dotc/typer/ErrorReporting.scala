@@ -11,6 +11,7 @@ import NameOps.*
 import util.Spans.NoSpan
 import util.SrcPos
 import config.Feature
+import inlines.Inlines
 import reporting.*
 import collection.mutable
 
@@ -192,10 +193,20 @@ object ErrorReporting {
               i"\n\nMaybe the enclosing block is missing a final expression$after?" :: Nil
             case _ =>
               Nil
+        case _ if tree.hasAttachment(Inlines.TransparentInlinedCall) =>
+          tree.getAttachment(Inlines.TransparentInlinedCall).map(transparentInlineExpansionNote).toList
         case _ =>
           Nil
       errorTree(tree, TypeMismatch(treeTp, expectedTp, Some(tree), implicitFailure.whyNoConversion, moreNotes.mkString))
     }
+
+    def transparentInlineExpansionNote(inlined: String)(using Context): String =
+        i"""
+           |
+           |Note: `$inlined` is transparent inline, but its precise type may not be available here.
+           |This can happen when:
+           |- It is used inside another inline body.
+           |- Its result type depends on another inline expansion or on an inline parameter."""
 
     /** A subtype log explaining why `found` does not conform to `expected` */
     def whyNoMatchStr(found: Type, expected: Type): String =
