@@ -221,6 +221,7 @@ class TabcompleteTests extends ReplTest {
         ":quit",
         ":require",
         ":reset",
+        ":save",
         ":settings",
         ":sh",
         ":silent",
