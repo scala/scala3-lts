@@ -209,7 +209,7 @@ object ErrorReporting {
            |- Its result type depends on another inline expansion or on an inline parameter."""
 
     def transparentInlineSelectAddendum(qual: Tree)(using Context): String =
-      if qual.symbol.is(Transparent) then transparentInlineExpansionNote(qual.symbol.show).render
+      if qual.symbol.is(Transparent) then transparentInlineExpansionNote(qual.symbol.show)
       else ""
 
     /** A subtype log explaining why `found` does not conform to `expected` */
