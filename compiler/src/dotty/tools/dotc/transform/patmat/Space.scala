@@ -506,13 +506,13 @@ object SpaceEngine {
         tp.derivedAppliedType(erase(tycon, inArray = inArray, isValue = false, isTyped = false), args2)
 
       case tp @ OrType(tp1, tp2) =>
-        OrType(erase(tp1, inArray, isValue), erase(tp2, inArray, isValue), tp.isSoft)
+        OrType(erase(tp1, inArray, isValue, isTyped), erase(tp2, inArray, isValue, isTyped), tp.isSoft)
 
       case AndType(tp1, tp2) =>
-        AndType(erase(tp1, inArray, isValue), erase(tp2, inArray, isValue))
+        AndType(erase(tp1, inArray, isValue, isTyped), erase(tp2, inArray, isValue, isTyped))
 
-      case tp @ RefinedType(parent, _, _) =>
-        erase(parent, inArray, isValue)
+      case tp @ RefinedType(parent, name, info) =>
+        tp.derivedRefinedType(erase(parent, inArray, isValue, isTyped), name, erase(info, inArray, isValue, isTyped))
 
       case tref: TypeRef if tref.symbol.isPatternBound =>
         if inArray then erase(tref.underlying, inArray, isValue, isTyped)
