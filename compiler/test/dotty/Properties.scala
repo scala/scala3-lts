@@ -64,6 +64,12 @@ object Properties {
   /** dotty-repl jar */
   def dottyRepl: String = sys.props("dotty.tests.classes.dottyRepl").nn
 
+  /** scala3-directives-parser jar */
+  def dottyDirectivesParser: String = sys.props("dotty.tests.classes.dottyDirectivesParser").nn
+
+  /** coursier interface jar, used by the REPL to resolve dependencies */
+  def coursierInterface: String = sys.props("dotty.tests.classes.coursierInterface").nn
+
   /** dotty-staging jar */
   def dottyStaging: String = sys.props("dotty.tests.classes.dottyStaging").nn
 
