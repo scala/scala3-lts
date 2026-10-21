@@ -921,6 +921,8 @@ object Build {
           s"-Ddotty.tests.classes.dottyInterfaces=${(`scala3-interfaces` / Compile / packageBin).value}",
           s"-Ddotty.tests.classes.dottyCompiler=${(`scala3-compiler-bootstrapped` / Compile / packageBin).value}",
           s"-Ddotty.tests.classes.dottyRepl=${(ThisProject / Compile / packageBin).value}",
+          s"-Ddotty.tests.classes.dottyDirectivesParser=${(`scala3-directives-parser-bootstrapped` / Compile / packageBin).value}",
+          s"-Ddotty.tests.classes.coursierInterface=${findArtifactPath(externalDeps, "interface")}",
           s"-Ddotty.tests.classes.tastyCore=${(`tasty-core-bootstrapped` / Compile / packageBin).value}",
           s"-Ddotty.tests.classes.compilerInterface=${findArtifactPath(externalDeps, "compiler-interface")}",
           s"-Ddotty.tests.classes.scalaLibrary=${(`scala-library-bootstrapped` / Compile / packageBin).value}",

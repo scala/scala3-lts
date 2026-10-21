@@ -59,6 +59,8 @@ object TestConfiguration {
   lazy val replClassPath =
     withCompilerClasspath + File.pathSeparator + mkClasspath(List(
       Properties.dottyRepl,
+      Properties.dottyDirectivesParser,
+      Properties.coursierInterface,
       Properties.jlineTerminal,
       Properties.jlineReader,
       Properties.scalaXml
