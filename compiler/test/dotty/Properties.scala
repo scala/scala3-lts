@@ -62,7 +62,13 @@ object Properties {
   def dottyCompiler: String = sys.props("dotty.tests.classes.dottyCompiler").nn
 
   /** dotty-repl jar */
-  def dottyRepl: String = sys.props("dotty.tests.classes.dottyRepl")
+  def dottyRepl: String = sys.props("dotty.tests.classes.dottyRepl").nn
+
+  /** scala3-directives-parser jar */
+  def dottyDirectivesParser: String = sys.props("dotty.tests.classes.dottyDirectivesParser").nn
+
+  /** coursier interface jar, used by the REPL to resolve dependencies */
+  def coursierInterface: String = sys.props("dotty.tests.classes.coursierInterface").nn
 
   /** dotty-staging jar */
   def dottyStaging: String = sys.props("dotty.tests.classes.dottyStaging").nn
@@ -95,7 +101,7 @@ object Properties {
   def jlineReader: String = sys.props("dotty.tests.classes.jlineReader").nn
 
   /** scala-xml jar */
-  def scalaXml: String = sys.props("dotty.tests.classes.scalaXml")
+  def scalaXml: String = sys.props("dotty.tests.classes.scalaXml").nn
 
   /** scalajs-javalib jar */
   def scalaJSJavalib: String = sys.props("dotty.tests.classes.scalaJSJavalib").nn
