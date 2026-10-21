@@ -415,11 +415,13 @@ trait BCodeHelpers extends BCodeIdiomatic {
         def computeMemberType(): Type = {
           // Mixins are resolved _after_ erasure, so we cannot simply ask for "the information before erasure" for these,
           // since that information never existed.
-          // Thus, we first check if the symbol was specifically marked as having generic information,
-          if sym.is(MixedIn) then mixinPhase.asInstanceOf[Mixin].mixinGenericInfos.get(sym) match
-            // and if so, we use it.
-            case Some(genericInfo) => return genericInfo
-            case _ => ()
+          // Thus, we first check if the symbol was specifically marked as having generic information.
+          // Trait setters are not MixedIn, but their unerased info is stored the same way.
+          if sym.is(MixedIn) || sym.name.is(NameKinds.TraitSetterName) then
+            mixinPhase.asInstanceOf[Mixin].mixinGenericInfos.get(sym) match
+              // and if so, we use it.
+              case Some(genericInfo) => return genericInfo
+              case _ => ()
 
           // Methods are straightforward.
           if sym.is(Method) then
