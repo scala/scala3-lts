@@ -2,6 +2,50 @@ import sbt._
 import Build._
 
 object ScaladocGeneration {
+  /** Docs tree for a stable release: reference only, without the nightly banner.
+   *
+   *  Contributing, Internals, and the blog stay on nightly builds. The banner removal
+   *  matches the layout patch applied by hand for 3.7 releases; on main the banner is
+   *  injected only while generating snapshot docs.
+   */
+  def prepareStableDocumentationDir(target: File): Unit = {
+    IO.copyDirectory(file("docs"), target)
+    IO.delete(target / "_blog")
+    stripSidebarSections(target / "sidebar.yml", Set("Contributing", "Internals"))
+    stripNightlyWarning(target / "_layouts" / "static-site-main.html")
+  }
+
+  /** Drop top-level sidebar sections. Nested entries stay, because they are indented further. */
+  private def stripSidebarSections(sidebar: File, titles: Set[String]): Unit = {
+    val kept = List.newBuilder[String]
+    var skipping = false
+    var removed = Set.empty[String]
+    for (line <- IO.read(sidebar).split("\n", -1)) {
+      if (line.startsWith("  - ")) {
+        val title = titles.find(t => line == s"  - title: $t")
+        skipping = title.nonEmpty
+        title.foreach(t => removed += t)
+      }
+      if (!skipping) kept += line
+    }
+    val missing = titles -- removed
+    if (missing.nonEmpty)
+      sys.error(s"Sidebar sections not found in ${sidebar}: ${missing.mkString(", ")}")
+    IO.write(sidebar, kept.result().mkString("\n"))
+  }
+
+  /** Same edit used when publishing 3.7 docs: drop the nightly banner, keep page navigation. */
+  private def stripNightlyWarning(layout: File): Unit = {
+    val original = IO.read(layout)
+    val warning = """(?s)\s*\{% if page\.nightlyOf %\}.*?\{% endif %\}""".r
+    val updated = warning.replaceFirstIn(original, "")
+    if (updated == original)
+      sys.error(s"Nightly warning block not found in ${layout}")
+    if (updated.contains("nightly documentation") || !updated.contains("{{ content }}"))
+      sys.error(s"Failed to strip the nightly warning from ${layout}")
+    IO.write(layout, updated)
+  }
+
   def generateCommand(config: GenerationConfig): String =
     " " + config.serialize
 
