@@ -218,6 +218,7 @@ class TabcompleteTests extends ReplTest {
         ":jar",
         ":kind",
         ":load",
+        ":paste",
         ":quit",
         ":require",
         ":reset",
