@@ -17,6 +17,9 @@ object MiMaFilters {
         ProblemFilters.exclude[DirectMissingMethodProblem]("scala.collection.ArrayOps.scala$collection$ArrayOps$$elemTag$extension"),
         ProblemFilters.exclude[MissingFieldProblem]("scala.language#experimental.safe"),
         ProblemFilters.exclude[MissingClassProblem]("scala.language$experimental$safe$")
+
+        // new annotation encoding capture checking's `x.except[C]` capabilities
+        ProblemFilters.exclude[MissingClassProblem]("scala.annotation.internal.exceptCapability"),
     ))
 
     val BackwardsBreakingChanges: Map[String, Seq[ProblemFilter]] = Map(
