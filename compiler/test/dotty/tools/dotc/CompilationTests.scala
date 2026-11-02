@@ -264,7 +264,7 @@ class CompilationTests {
         withCoverage(compileFile("tests/explicit-nulls/special/25722/jstubs/jstubs/lib/Foo.java", i25722Options.withClasspath(outDir1))(using i25722Group).keepOutput),
         withCoverage(compileDir("tests/explicit-nulls/special/25722/scala", i25722Options.withClasspath(outDir2))(using i25722Group).keepOutput)
       )
-      tests.foreach(t => runWithCoverageOrFallback[PosTestWithCoverage](t, "Pos"))
+      tests.foreach(t => runWithCoverageOrFallback[PosTestWithCoverage](t))
       tests.foreach(_.delete())
     }
 
