@@ -7,7 +7,7 @@ import org.junit.Assert.assertEquals
 class ReplClasspathUpdateTests extends ReplTest:
   private def resolveOsLib()(using State): Unit =
     run(":dep com.lihaoyi::os-lib:0.11.8")
-    assertEquals("Resolved a dependency (5 JARs)", storedOutput().trim)
+    assertEquals("Resolved 1 dependencies (5 JARs)", storedOutput().trim)
 
   @Test def `i26598 dep after type query does not crash`: Unit =
     initially:
