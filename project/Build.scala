@@ -1729,8 +1729,22 @@ object Build {
         })
         val overrideFunc = outputDirOverride.andThen(justAPI)
 
+        // Stable publishing drops the nightly-only site sections. `--justAPI` skips the site entirely.
+        val stableDocs =
+          if (justAPIArg.nonEmpty) None
+          else Some(IO.createTemporaryDirectory).map { dir =>
+            ScaladocGeneration.prepareStableDocumentationDir(dir)
+            dir
+          }
+
         val config = Def.task {
-          overrideFunc(Scala3.value)
+          val base = overrideFunc(Scala3.value)
+          stableDocs.fold(base) { dir =>
+            val links = base.get[SourceLinks].toList.flatMap(_.value)
+            base
+              .add(SiteRoot(dir.getAbsolutePath))
+              .add(SourceLinks(s"${dir.getAbsolutePath}=github://scala/scala3/main#docs" :: links))
+          }
         }
 
         val writeAdditionalFiles = Def.task {
@@ -1747,7 +1761,19 @@ object Build {
 
       generateStableScala3Documentation := Def.inputTaskDyn {
         val extraArgs = spaceDelimited("<version>").parsed
-        val config = stableScala3(extraArgs.head)
+        val version = extraArgs.head
+        val stableDocs = IO.createTemporaryDirectory
+        ScaladocGeneration.prepareStableDocumentationDir(stableDocs)
+
+        val config = Def.task {
+          val base = stableScala3(version).value
+          val links = base.get[SourceLinks].toList.flatMap(_.value)
+          base
+            .add(SiteRoot(stableDocs.getAbsolutePath))
+            .add(SourceLinks(s"${stableDocs.getAbsolutePath}=github://scala/scala3/$version#docs" :: links))
+            .add(Revision(version))
+            .add(OutputDir(file(s"scaladoc/output/$version").getAbsoluteFile.getAbsolutePath))
+        }
         generateDocumentation(config)
       }.evaluated,
 
