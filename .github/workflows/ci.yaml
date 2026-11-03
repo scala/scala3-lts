@@ -487,7 +487,18 @@ jobs:
 
       - name: Test sbt
         run: ./project/scripts/sbt "sbt-test/scripted; sbt-community-build/scripted"
-
+  
+  test-bisect-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: coursier/cache-action@v8
+      - uses: VirtusLab/scala-cli-setup@v1.15
+        with:
+          jvm: temurin:17
+      - name: Run bisect script tests
+        run: scala-cli test project/scripts/bisect.test.scala
+  
   test_java8:
     runs-on: [self-hosted, Linux]
     container:
