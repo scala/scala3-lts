@@ -1,4 +1,3 @@
-//> using jvm 8
 /*
 This script will bisect a problem with the compiler based on success/failure of the validation script passed as an argument.
 It starts with a fast bisection on released nightly builds.
@@ -241,14 +240,19 @@ object Releases:
 
   lazy val allReleases: Vector[Release] =
     val re = raw"<version>(.+-bin-\d{8}-\w{7}-NIGHTLY)</version>".r
-    val xml = io.Source.fromURL(
-      "https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/maven-metadata.xml"
-    )
-    re.findAllMatchIn(xml.mkString)
-      .flatMap{ m => Option(m.group(1)).map(Release.apply) }
-      .toVector
-      .sortBy: release =>
-        (release.semanticVersion, release.date)
+    val releases =
+      for
+        url <- metadataUrls
+        release <- releasesFrom(url, re)
+      yield release
+    releases.distinctBy(_.version).sortBy(release => (release.semanticVersion, release.date)).toVector
+
+  private def releasesFrom(url: String, re: scala.util.matching.Regex): Vector[Release] =
+    Using(Source.fromURL(url)): source =>
+      re.findAllMatchIn(source.mkString)
+        .flatMap(m => Option(m.group(1)).map(Release.apply))
+        .toVector
+    .get
 
   def fromRange(range: ReleasesRange): Vector[Release] = range.filter(allReleases)
 
