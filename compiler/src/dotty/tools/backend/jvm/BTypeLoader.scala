@@ -85,8 +85,8 @@ final class BTypeLoader(primitives: ScalaPrimitives, inlineInfoLoader: () => Opt
       assert(
         classSym != defn.NothingClass && classSym != defn.NullClass,
         s"Cannot create ClassBType for special class symbol ${classSym.showFullName}")
-      assert(classSym != defn.ArrayClass || BackendUtils.compilingArray, s"Found $classSym while compiling ${ctx.compilationUnit.source.file.name}")
-      assert(!classSym.isPrimitiveValueClass || BackendUtils.compilingPrimitive, s"Found $classSym while compiling ${ctx.compilationUnit.source.file.name}")
+      assert(classSym != defn.ArrayClass || BackendUtils.compilingArray, s"Found $classSym while compiling ${ctx.compilationUnit.source.name}")
+      assert(!classSym.isPrimitiveValueClass || BackendUtils.compilingPrimitive, s"Found $classSym while compiling ${ctx.compilationUnit.source.name}")
 
       val result = classBType(classSym.javaBinaryName)(ct => createClassInfo(ct, classSym.asClass))
       classBTypeCacheBySymbol.update(classSym0, result)
