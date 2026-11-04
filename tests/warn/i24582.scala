@@ -1,5 +1,5 @@
 // Test for issue #24582: Spurious shadowing warning for type parameters
-//> using options -Wshadow:type-parameter-shadow
+//> using options -Xlint:type-parameter-shadow
 
 import scala.compiletime.ops.int.+
 
