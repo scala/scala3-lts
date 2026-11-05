@@ -616,7 +616,7 @@ trait ParallelTesting extends RunnerOrchestration:
             ModuleName(moduleName),
             attributes = Map.empty
           ),
-          version = VersionConstraint(compiler)
+          VersionConstraint(compiler)
         )
         Fetch()
           .addDependencies(dep)
