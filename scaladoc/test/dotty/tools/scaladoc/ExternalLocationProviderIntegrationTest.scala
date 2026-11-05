@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import org.jsoup.Jsoup
 import util.IO
 import scala.util.Properties
+import org.junit.Test
 
 class JavadocExternalLocationProviderIntegrationTest extends ExternalLocationProviderIntegrationTest(
   "externalJavadoc",
@@ -95,7 +96,8 @@ abstract class ExternalLocationProviderIntegrationTest(
       ).toList
   )
 
-  override def runTest = if(!Properties.isWin) {
+  @Test
+  def runTest(): Unit = if(!Properties.isWin) {
     afterRendering {
       val output = summon[DocContext].args.output.toPath
       val linksBuilder = List.newBuilder[String]
