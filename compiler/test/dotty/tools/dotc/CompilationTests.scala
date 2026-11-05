@@ -157,7 +157,7 @@ class CompilationTests {
         defaultOptions),
       compileFile("tests/neg/i7575.scala", defaultOptions.withoutLanguageFeatures),
       compileFile("tests/neg-custom-args/i20491/Test.scala", defaultOptions.withClasspath("tests/neg-custom-args/i20491/cp")),
-      compileFile("tests/neg-custom-args/empty-compiled-with-dir.scala", defaultOptions.and("tests"))
+      compileFile("tests/neg-custom-args/empty-compiled-with-dir.scala", defaultOptions.and("tests")),
       compileFile("tests/neg-custom-args/missing-java-outer-dependency/TestInner.scala",
           defaultOptions.withClasspath("tests/neg-custom-args/missing-java-outer-dependency/cp")),
       compileFile("tests/neg-custom-args/missing-java-outer-dependency/TestImportSuggestion.scala",

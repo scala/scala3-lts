@@ -13,6 +13,18 @@ package object tools {
   def unreachable(x: Any = "<< this case was declared unreachable >>"): Nothing =
     throw new MatchError(x)
 
+  /**
+   * Allows one to lazily initialize values without explicit `.nn`.
+   * This is useful for values that need a Context and thus can't be `lazy val`s.
+   */
+  inline def initialize[T](getter: T | Null, inline setter: T => Unit, inline value: => T): T =
+    if getter != null then
+      getter
+    else
+      val res = value
+      setter(res)
+      res
+
   /** Forward-ported from the explicit-nulls branch. */
   extension [T](x: T | Null)
     /** Should be used when we know from the context that `x` is not null.

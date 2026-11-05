@@ -605,7 +605,7 @@ object BackendUtils {
   // ===
 
   def compilingArray(using Context) =
-    ctx.compilationUnit.source.file.name == "Array.scala"
+    ctx.compilationUnit.source.name == "Array.scala"
 
   private val primitiveCompilationUnits = Set(
     "Unit.scala",
@@ -620,7 +620,7 @@ object BackendUtils {
   )
 
   def compilingPrimitive(using Context) =
-    primitiveCompilationUnits(ctx.compilationUnit.source.file.name)
+    primitiveCompilationUnits(ctx.compilationUnit.source.name)
 
   // ===
 

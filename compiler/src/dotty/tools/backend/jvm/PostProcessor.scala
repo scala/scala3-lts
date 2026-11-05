@@ -84,7 +84,7 @@ class PostProcessor(frontendAccess: PostProcessorFrontendAccess,
     for u <- generatedUnits
         c <- u.classes
     do
-      byteCodeRepository.add(c.classNode, Some(u.sourceFile.path))
+      byteCodeRepository.add(c.classNode, Some(u.sourcePath))
     for u <- generatedUnits
         c <- u.classes
         if !c.isArtifact // skip call graph for mirror / bean: we don't inline into them, and they are not referenced from other classes
