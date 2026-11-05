@@ -25,8 +25,9 @@ import ValueClasses.*
  *  This is necessary since private methods are not allowed to have the same name
  *  as inherited public ones.
  *
- *  See discussion in https://github.com/lampepfl/dotty/pull/784
- *  and https://github.com/lampepfl/dotty/issues/783
+ *  (See discussion in https://github.com/scala/scala3/pull/784
+ *  and https://github.com/scala/scala3/issues/783)
+ *
  */
 class ExpandPrivate extends MiniPhase with IdentityDenotTransformer { thisPhase =>
   import ast.tpd.*
@@ -63,7 +64,8 @@ class ExpandPrivate extends MiniPhase with IdentityDenotTransformer { thisPhase 
    *  If we change the scheme at one point to make static module class computations
    *  static members of the companion class, we should tighten the condition below.
    */
-  private def ensurePrivateAccessible(d: SymDenotation)(using Context) =
+  private def ensurePrivateAccessible(tree: Ident | Select)(using Context) =
+    val d = tree.symbol.denot
     if (isVCPrivateParamAccessor(d))
       d.ensureNotPrivate.installAfter(thisPhase)
     else if (d.is(PrivateTerm) && !d.owner.is(Package) && d.owner != ctx.owner.lexicallyEnclosingClass) {
@@ -82,20 +84,24 @@ class ExpandPrivate extends MiniPhase with IdentityDenotTransformer { thisPhase 
         (j < 0 || p2(j) == separatorChar)
       }
 
-      assert(d.symbol.source.exists &&
-             ctx.owner.source.exists &&
-             isSimilar(d.symbol.source.path, ctx.owner.source.path),
-          s"private ${d.symbol.showLocated} in ${d.symbol.source} accessed from ${ctx.owner.showLocated} in ${ctx.owner.source}")
+      val accessOK =
+           // e.g. erased isInstanceOf singleton is a reference test
+        tree.span.exists && tree.span.isSynthetic 
+        ||    d.symbol.source.exists
+           && ctx.owner.source.exists
+           && isSimilar(d.symbol.source.path, ctx.owner.source.path)
+      assert(accessOK, s"private ${d.symbol.showLocated} in ${d.symbol.source
+        } accessed from ${ctx.owner.showLocated} in ${ctx.owner.source}")
       d.ensureNotPrivate.installAfter(thisPhase)
     }
 
   override def transformIdent(tree: Ident)(using Context): Ident = {
-    ensurePrivateAccessible(tree.symbol)
+    ensurePrivateAccessible(tree)
     tree
   }
 
   override def transformSelect(tree: Select)(using Context): Select = {
-    ensurePrivateAccessible(tree.symbol)
+    ensurePrivateAccessible(tree)
     tree
   }
 
