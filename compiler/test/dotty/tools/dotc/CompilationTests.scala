@@ -129,6 +129,7 @@ class CompilationTests {
 
   @Test def negAll: Unit = {
     implicit val testGroup: TestGroup = TestGroup("compileNeg")
+
     aggregateTests(
       compileFilesInDir("tests/neg", defaultOptions),
       compileFilesInDir("tests/neg-deep-subtype", allowDeepSubtypes),
@@ -141,6 +142,10 @@ class CompilationTests {
         defaultOptions),
       compileFile("tests/neg/i7575.scala", defaultOptions.withoutLanguageFeatures.and("-language:_")),
       compileFile("tests/neg-custom-args/i20491/Test.scala", defaultOptions.withClasspath("tests/neg-custom-args/i20491/cp")),
+      compileFile("tests/neg-custom-args/missing-java-outer-dependency/TestInner.scala",
+          defaultOptions.withClasspath("tests/neg-custom-args/missing-java-outer-dependency/cp")),
+      compileFile("tests/neg-custom-args/missing-java-outer-dependency/TestImportSuggestion.scala",
+          defaultOptions.withClasspath("tests/neg-custom-args/missing-java-outer-dependency/cp")),
     ).checkExpectedErrors()
   }
 
