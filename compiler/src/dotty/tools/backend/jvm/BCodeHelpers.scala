@@ -578,7 +578,7 @@ trait BCodeHelpers(val bTypeLoader: BTypeLoader, val bTypes: WellKnownBTypes) ex
       )
 
       if (BackendUtils.emitSource) {
-        mirrorClass.visitSource("" + ctx.compilationUnit.source.file.name, null /* SourceDebugExtension */)
+        mirrorClass.visitSource("" + ctx.compilationUnit.source.name, null /* SourceDebugExtension */)
       }
 
       val ssa = None // getAnnotPickle(mirrorName, if (moduleClass.is(Module)) moduleClass.companionClass else moduleClass.companionModule)

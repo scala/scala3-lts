@@ -50,7 +50,6 @@ class CodeGen(val backendUtils: BackendUtils, val primitives: ScalaPrimitives, v
     def genClassDef(cd: TypeDef): Unit =
       try
         val sym = cd.symbol
-        val sourceFile = ctx.compilationUnit.source.file
         val mainClassNode = genClass(cd)
         val mirrorClassNode =
           if !sym.isTopLevelModuleClass then null
@@ -107,7 +106,7 @@ class CodeGen(val backendUtils: BackendUtils, val primitives: ScalaPrimitives, v
 
     genClassDefs(ctx.compilationUnit.tpdTree)
     generatedClassHandler.process(
-      GeneratedCompilationUnit(ctx.compilationUnit.source.file, generatedClasses.toList, generatedTasty.toList)
+      GeneratedCompilationUnit(ctx.compilationUnit.source.path, generatedClasses.toList, generatedTasty.toList)
     )
   }
 
