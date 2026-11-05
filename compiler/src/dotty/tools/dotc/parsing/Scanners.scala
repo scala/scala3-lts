@@ -926,7 +926,9 @@ object Scanners {
         case '\"' =>
           def stringPart(multiLine: Boolean) = {
             getStringPart(multiLine)
-            currentRegion = InString(multiLine, currentRegion)
+            // don't edit the region if we recovered from a parsing error by inserting a semicolon
+            if token != SEMI then
+              currentRegion = InString(delimChar, delimCount, currentRegion)
           }
           def fetchDoubleQuote() =
             if (token == INTERPOLATIONID) {
@@ -1236,7 +1238,14 @@ object Scanners {
       if migrateTo3 then canStartExprTokens2 else canStartExprTokens3
 
 // Literals -----------------------------------------------------------------
-
+    
+    private def unclosedStringLit(): Unit =
+      error(em"unclosed string literal")
+      // Recover as best we can by pretending the line has ended
+      litBuf.clear()
+      adjustSepRegions(STRINGLIT)
+      token = SEMI
+    
     private def getStringLit() = {
       getLitChars('"')
       if (ch == '"') {
@@ -1244,7 +1253,7 @@ object Scanners {
         nextChar()
         token = STRINGLIT
       }
-      else error(em"unclosed string literal")
+      else unclosedStringLit()
     }
 
     private def getRawStringLit(): Unit =
@@ -1338,7 +1347,7 @@ object Scanners {
           if (multiLine)
             incompleteInputError(em"unclosed multi-line string literal")
           else
-            error(em"unclosed string literal")
+            unclosedStringLit()
         else {
           putChar(ch)
           nextRawChar()
