@@ -1,4 +1,3 @@
-//> using jvm 8
 /*
 This script will bisect a problem with the compiler based on success/failure of the validation script passed as an argument.
 It starts with a fast bisection on released nightly builds.
@@ -15,6 +14,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import scala.util.Using
 
 val usageMessage = """
   |Usage:
@@ -231,16 +231,28 @@ object ReleasesRange:
 class Releases(val releases: Vector[Release])
 
 object Releases:
+  /* Nightlies used to be published to Maven Central and are published to the Artifactory nightlies
+   * repository since 2025-08. Neither repository holds the full history on its own, so both are queried. */
+  private val metadataUrls = Seq(
+    "https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/maven-metadata.xml",
+    "https://repo.scala-lang.org/artifactory/maven-nightlies/org/scala-lang/scala3-compiler_3/maven-metadata.xml"
+  )
+
   lazy val allReleases: Vector[Release] =
     val re = raw"<version>(.+-bin-\d{8}-\w{7}-NIGHTLY)</version>".r
-    val xml = io.Source.fromURL(
-      "https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/maven-metadata.xml"
-    )
-    re.findAllMatchIn(xml.mkString)
-      .flatMap{ m => Option(m.group(1)).map(Release.apply) }
-      .toVector
-      .sortBy: release =>
-        (release.semanticVersion, release.date)
+    val releases =
+      for
+        url <- metadataUrls
+        release <- releasesFrom(url, re)
+      yield release
+    releases.distinctBy(_.version).sortBy(release => (release.semanticVersion, release.date)).toVector
+
+  private def releasesFrom(url: String, re: scala.util.matching.Regex): Vector[Release] =
+    Using(Source.fromURL(url)): source =>
+      re.findAllMatchIn(source.mkString)
+        .flatMap(m => Option(m.group(1)).map(Release.apply))
+        .toVector
+    .get
 
   def fromRange(range: ReleasesRange): Vector[Release] = range.filter(allReleases)
 
