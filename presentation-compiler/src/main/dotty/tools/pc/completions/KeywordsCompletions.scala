@@ -14,6 +14,10 @@ import dotty.tools.dotc.util.SourcePosition
 
 object KeywordsCompletions:
 
+  val allLegitimateKeywords: List[Keyword] = Keyword.all.filter { kw =>
+    kw.name != "into"
+  }
+
   def contribute(
       path: List[Tree],
       completionPos: CompletionPos,
@@ -24,7 +28,7 @@ object KeywordsCompletions:
 
     path match
       case Nil | (_: PackageDef) :: _ if completionPos.query.isEmpty() =>
-        Keyword.all.collect {
+        allLegitimateKeywords.collect {
           // topelevel definitions are allowed in Scala 3
           case kw if (kw.isPackage || kw.isTemplate) && notInComment =>
             CompletionValue.keyword(kw.name, kw.insertText)
@@ -42,7 +46,7 @@ object KeywordsCompletions:
         val possibleTemplateKeywords =
           checkTemplateForNewParents(enclosing = path, completionPos)
 
-        Keyword.all.collect {
+        allLegitimateKeywords.collect {
           case kw
               if kw.matchesPosition(
                 completionPos.query,
