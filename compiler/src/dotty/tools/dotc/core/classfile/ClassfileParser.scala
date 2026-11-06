@@ -1134,7 +1134,6 @@ class ClassfileParser(
     newStubSymbol(
       owner,
       entry.originalName.toTypeName,
-      CompilationUnitInfo(classfile),
     )
 
   private object innerClasses extends util.HashMap[String, InnerClassEntry] {

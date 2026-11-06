@@ -123,7 +123,7 @@ class TypeComparer(@constructorOnly initctx: Context) extends ConstraintHandling
     assert(pendingSubTypes == null || pendingSubTypes.uncheckedNN.isEmpty)
     pendingAppliedTypeParamRefs match
       case null => ()
-      case ps => assert(ps.isEmpty)
+      case ps => assert(ps.uncheckedNN.isEmpty)
     assert(canCompareAtoms == true)
     assert(successCount == 0)
     assert(totalCount == 0)
