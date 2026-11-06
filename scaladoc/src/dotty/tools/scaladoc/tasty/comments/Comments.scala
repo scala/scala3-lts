@@ -133,8 +133,7 @@ abstract class MarkupConversion[T](val repr: Repr)(using dctx: DocContext) {
                   oldPos.span.shift(1)
               }
             if (!summon[DocContext].args.noLinkWarnings) then
-
-              report.warning(msg, srcPos)
+              report.warning(msg, pos)
 
             DocLink.UnresolvedDRI(queryStr, txt)
 
