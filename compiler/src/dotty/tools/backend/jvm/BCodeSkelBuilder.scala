@@ -952,7 +952,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
     }
 
     def genSynchronized(tree: Tree, args: List[Tree], expectedType: BType)(using Context): BType
-    def genAdaptAndSendToDest(generatedType: BType | Null, expectedType: BType, dest: LoadDestination)(using Context): Unit
+    def genAdaptAndSendToDest(generatedType: BType, expectedType: BType, dest: LoadDestination)(using Context): Unit
     def genLoadTo(tree: Tree, expectedType: BType, dest: LoadDestination)(using Context): Unit
 
   } // end of class PlainSkelBuilder
