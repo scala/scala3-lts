@@ -928,7 +928,7 @@ object Scanners {
             getStringPart(multiLine)
             // don't edit the region if we recovered from a parsing error by inserting a semicolon
             if token != SEMI then
-              currentRegion = InString(delimChar, delimCount, currentRegion)
+              currentRegion = InString(multiLine, currentRegion)
           }
           def fetchDoubleQuote() =
             if (token == INTERPOLATIONID) {

@@ -773,10 +773,12 @@ trait BCodeBodyBuilder(val primitives: ScalaPrimitives) extends BCodeSkelBuilder
 
           generatedType = bTypeLoader.bTypeFromType(c.typeValue)
           mkArrayConstructorCall(generatedType.asArrayBType, app, av.elems)
-        case Apply(t :TypeApply, _) =>
+        case Apply(t @ TypeApply(fun, _), args) =>
           generatedType =
             if (t.symbol ne defn.Object_synchronized) genTypeApply(t)
-            else genSynchronized(app, expectedType)
+            else
+              genLoadQualifier(fun)
+              genSynchronized(app, args, expectedType)
 
         case Apply(fun @ DesugaredSelect(superRef @ Super(superQual, _), _), args) =>
           // 'super' call: Note: since constructors are supposed to
@@ -1762,7 +1764,6 @@ trait BCodeBodyBuilder(val primitives: ScalaPrimitives) extends BCodeSkelBuilder
     }
 
 
-    def genSynchronized(tree: Apply, expectedType: BType)(using Context): BType
     def genLoadTry(tree: Try)(using Context): BType
 
     def genInvokeDynamicLambda(ctor: Symbol, lambdaTarget: Symbol, environmentSize: Int, functionalInterface: Symbol)(using Context): BType = {
