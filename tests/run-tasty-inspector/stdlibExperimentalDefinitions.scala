@@ -99,6 +99,10 @@ val experimentalDefinitionInLibrary = Set(
 
   // New feature: Erased trait
   "scala.compiletime.Erased",
+  
+  // New feature: Specialized traits
+  "scala.specialize.Specialized",
+  "scala.specialize.Specialized$"
 )
 
 
