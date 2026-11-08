@@ -45,7 +45,6 @@ object Feature:
   val safe = experimental("safe")
   val specializedTraits = experimental("specializedTraits")
   val inlineTraits = experimental("inlineTraits")
-  val specializedTraits = experimental("specializedTraits")
 
   val nonViralExperimentalFeatures: Set[TermName] =
     Set(captureChecking, separationChecking, safe)
