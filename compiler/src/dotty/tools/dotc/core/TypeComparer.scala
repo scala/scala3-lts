@@ -44,11 +44,40 @@ class TypeComparer(@constructorOnly initctx: Context) extends ConstraintHandling
     monitored = false
     GADTused = false
     recCount = 0
+    appliedRecCount = 0
+    appliedMonitored = false
     needsGc = false
     frozenConstraint = false
     if Config.checkTypeComparerReset then checkReset()
 
   private var pendingSubTypes: util.MutableSet[(Type, Type)] | Null = null
+  /** Tracks the `(tycon, args, other, fromBelow, constraint)` tuples currently
+   *  being compared by [[compareAppliedTypeParamRef]] to guard against infinite recursion.
+   *  See https://github.com/scala/scala3/issues/24537.
+   */
+  private var pendingAppliedTypeParamRefs:
+    util.MutableSet[(TypeParamRef, List[Type], AppliedType, Boolean, Constraint)] | Null = null
+  private var appliedRecCount = 0
+  private var appliedMonitored = false
+
+  private inline def guardAppliedTypeParamRef(
+      tycon: TypeParamRef, args: List[Type], other: AppliedType, fromBelow: Boolean)(inline op: Boolean): Boolean =
+    def monitoredAppliedTypeParamRef =
+      if pendingAppliedTypeParamRefs == null then
+        pendingAppliedTypeParamRefs = util.HashSet[(TypeParamRef, List[Type], AppliedType, Boolean, Constraint)]()
+      val key = (tycon, args, other, fromBelow, constraint)
+      !pendingAppliedTypeParamRefs.nn.contains(key) && {
+        pendingAppliedTypeParamRefs.nn += key
+        try op finally pendingAppliedTypeParamRefs.nn -= key
+      }
+
+    appliedRecCount += 1
+    try
+      if appliedRecCount >= Config.LogPendingAppliedTypeParamRefsThreshold then
+        appliedMonitored = true
+      if appliedMonitored then monitoredAppliedTypeParamRef else op
+    finally appliedRecCount -= 1
+
   private var recCount = 0
   private var monitored = false
 
@@ -92,6 +121,9 @@ class TypeComparer(@constructorOnly initctx: Context) extends ConstraintHandling
   override def checkReset() =
     super.checkReset()
     assert(pendingSubTypes == null || pendingSubTypes.uncheckedNN.isEmpty)
+    pendingAppliedTypeParamRefs match
+      case null => ()
+      case ps => assert(ps.isEmpty)
     assert(canCompareAtoms == true)
     assert(successCount == 0)
     assert(totalCount == 0)
@@ -1157,9 +1189,11 @@ class TypeComparer(@constructorOnly initctx: Context) extends ConstraintHandling
                 tl => otherTycon.appliedTo(bodyArgs(tl)))
             else
               otherTycon
-          rollbackConstraintsUnless:
-            (assumedTrue(tycon) || directionalIsSubType(tycon, adaptedTycon))
-              && directionalRecur(adaptedTycon.appliedTo(args), other)
+          /** Break the i24537 cycle when neither the comparison nor its constraint changes. */
+          guardAppliedTypeParamRef(tycon, args, other, fromBelow):
+            rollbackConstraintsUnless:
+              (assumedTrue(tycon) || directionalIsSubType(tycon, adaptedTycon))
+                && directionalRecur(adaptedTycon.appliedTo(args), other)
         }
       }
     end compareAppliedTypeParamRef
