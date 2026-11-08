@@ -115,7 +115,7 @@ class ScaladocSettings extends SettingGroup with AllScalaSettings:
     BooleanSetting("-Yapi-subdirectory", "Put the API documentation pages inside a directory `api/`", false)
 
   val warnOnUnusedOptions: Setting[Boolean] =
-    BooleanSetting(RootSetting, "warn-on-unused-options", "Controls whether a warning is emitted when scaladoc receives scalac options that have no effect.", false)
+    BooleanSetting("-warn-on-unused-options", "Controls whether a warning is emitted when scaladoc receives scalac options that have no effect.", false)
 
   val scastieConfiguration: Setting[String] =
     StringSetting("-scastie-configuration", "Scastie configuration", "Additional configuration passed to Scastie in code snippets", "")
