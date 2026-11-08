@@ -26,7 +26,7 @@ class LogicalPackagesProvider(sourcePath: String) {
    */
   def root(using Context): LogicalPackage =
     val pkg: ParsedLogicalPackage = newPackage()
-    val sourceRoots = allSources(sourcePath).map(f => SourceFile(f, Codec(ctx.settings.encoding.value)))
+    val sourceRoots = allSources(sourcePath).map(f => SourceFile(f, f.toCharArray))
     for sourceFile <- sourceRoots do
       try
         parseSourceFile(sourceFile, pkg)
