@@ -4,7 +4,6 @@ import scala.jdk.CollectionConverters.*
 import scala.util.Properties.{javaSpecVersion, versionNumberString}
 
 import java.io.File
-import java.lang.System.{lineSeparator => EOL}
 import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 
@@ -48,7 +47,7 @@ object FileDiff {
         None
       else
         Some(s"""|Output from '$sourceTitle' did not match check file. Actual output:
-                 |${outputLines.mkString(EOL)}
+                 |${outputLines.mkString(System.lineSeparator())}
                  |""".stripMargin + "\n")
     else
       assert(tolerateMissing, "Missing check file: " + path.toString)
@@ -70,7 +69,7 @@ object FileDiff {
 
   def dump(path: String, content: Seq[String]): Unit = {
     val outFile = dotty.tools.io.File(path)
-    outFile.writeAll(content.mkString("", EOL, EOL))
+    outFile.writeAll(content.mkString("", System.lineSeparator(), System.lineSeparator()))
   }
 
   def checkAndDumpOrUpdate(sourceTitle: String, actualLines: Seq[String], checkFilePath: String, tolerateMissingCheckFile: Boolean = true): Boolean = {
