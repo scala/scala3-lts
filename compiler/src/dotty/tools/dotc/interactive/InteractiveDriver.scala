@@ -11,6 +11,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.nio.charset.StandardCharsets
 import java.util.zip.*
 
+import scala.annotation.internal.sharable
 import scala.collection.*
 import scala.io.Codec
 
@@ -37,6 +38,7 @@ private class InteractiveContextBase(sourcePackage: CachedLogicalPackage) extend
 
 // Assumes the context does not change; only use if this is true!
 class CachedLogicalPackage(extractor: Context ?=> Option[LogicalPackage]) {
+  @sharable
   private var cached: Option[LogicalPackage] | Null = null
   def value(using Context): Option[LogicalPackage] =
     initialize(cached, cached = _, extractor)
