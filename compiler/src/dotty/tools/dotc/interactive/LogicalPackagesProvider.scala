@@ -19,21 +19,14 @@ import scala.util.control.NonFatal
  * A compiler component that adds support for parsing Scala and Java source files and finding out
  * the logical package structure of the whole source path.
  */
-class LogicalPackagesProvider(sourcePath: String){
-
-  // We only use it for parser
-  private given Context = new ContextBase().initialCtx
-
-  private lazy val sourceRoots: Seq[SourceFile] =
-    allSources(sourcePath).map(f => SourceFile(f, f.toCharArray))
-
-  lazy val root: LogicalPackage = parseSourcePath()
+class LogicalPackagesProvider(sourcePath: String) {
 
   /**
    * Parse all source files in the sourcepath and build the logical package structure.
    */
-  def parseSourcePath(): LogicalPackage =
+  def root(using Context): LogicalPackage =
     val pkg: ParsedLogicalPackage = newPackage()
+    val sourceRoots = allSources(sourcePath).map(f => SourceFile(f, Codec(ctx.settings.encoding.value)))
     for sourceFile <- sourceRoots do
       try
         parseSourceFile(sourceFile, pkg)
@@ -45,10 +38,7 @@ class LogicalPackagesProvider(sourcePath: String){
   private def newPackage(): ParsedLogicalPackage =
     new ParsedLogicalPackage("", None)
 
-  private def parseSourceFile(
-      sourceFile: SourceFile,
-      rootPackage: ParsedLogicalPackage
-  ): Unit =
+  private def parseSourceFile(sourceFile: SourceFile, rootPackage: ParsedLogicalPackage)(using Context): Unit =
     val fileName = sourceFile.path
     if fileName.endsWith(".scala") then
       parseScalaSourceFile(sourceFile, fileName, rootPackage)
@@ -59,7 +49,7 @@ class LogicalPackagesProvider(sourcePath: String){
       sourceFile: SourceFile,
       fileName: String,
       rootPackage: ParsedLogicalPackage
-  ): Unit =
+  )(using Context): Unit =
     try
       // Use OutlineParser for fast parsing that skips method bodies
       val parser = new Parsers.OutlineParser(sourceFile)
@@ -74,7 +64,7 @@ class LogicalPackagesProvider(sourcePath: String){
       sourceFile: SourceFile,
       fileName: String,
       rootPackage: ParsedLogicalPackage
-  ): Unit =
+  )(using Context): Unit =
     try
       // Use OutlineJavaParser for fast parsing
       val parser = new JavaParsers.OutlineJavaParser(sourceFile)
@@ -139,7 +129,7 @@ class LogicalPackagesProvider(sourcePath: String){
   /**
    * Return all Scala and Java sources from the given sourcepath string.
    */
-  private def allSources(srcPath: String): Seq[AbstractFile] = {
+  private def allSources(srcPath: String)(using Context): Seq[AbstractFile] = {
     val entries = ClassPath.split(srcPath).map(Path(_))
     def isRelevantFile(path: Path) =
       path.extension == "scala" || path.extension == "java"
@@ -161,7 +151,7 @@ class LogicalPackagesProvider(sourcePath: String){
   private def sourcesIn(
       dir: AbstractFile,
       extensions: String*
-  ): Seq[AbstractFile] =
+  )(using Context): Seq[AbstractFile] =
     dir.iterator().toSeq.flatMap { file =>
       if (file.isDirectory) sourcesIn(file, extensions*)
       else if (extensions.exists(ext => file.name.endsWith(s".$ext"))) Seq(file)
