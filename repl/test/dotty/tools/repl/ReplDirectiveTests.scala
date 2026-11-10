@@ -91,7 +91,7 @@ class ReplDirectiveTests extends ReplTest, SessionFileHelpers:
       assertEquals(
         """[warn] The REPL does not have a separate test scope. Dependencies that would only be
           |available to tests are added to the current REPL session.
-          |Resolved a dependency (8 JARs)""".stripMargin,
+          |Resolved 1 dependencies (8 JARs)""".stripMargin,
         storedOutput().trim
       )
 

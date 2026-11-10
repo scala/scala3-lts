@@ -444,23 +444,31 @@ class DesugarSpecializedTraits extends MiniPhase, IdentityDenotTransformer:
         checkSpecializedTraitRules(tree)
 
         val (stats1, specializedTraitCache2) = transformStatements(stats, specializedTraitCache)
-        
-        specializedTraitCache = specializedTraitCache2 
-          
-        val grouped = stats1.groupBy(tree => tree.symbol.enclosingPackageClass)
-          
-        // We need to copy the existing package so we don't lose any attachments 
-        // e.g. attachments used to calculate Wunused
-        cpy.PackageDef(pkg)(Ident(defn.EmptyPackageVal.namedType),
-          grouped.getOrElse(defn.RootClass, List()) :::
-          grouped.getOrElse(defn.EmptyPackageClass, List()) :::
-          grouped
-            .toList
-            .filter((pk, stmts) => pk != defn.RootClass && pk != defn.EmptyPackageClass)
-            .map((pkg, stmts) => tpd.PackageDef(Ident(pkg.sourceModule.namedType), stmts))
-        ).withType(defn.EmptyPackageVal.namedType)
+
+        specializedTraitCache = specializedTraitCache2
+
+        // Rebucketing moves leading language imports after the definitions they
+        // govern. Later phases thread imports in statement order, so an
+        // untouched unit must keep its original shape.
+        if stats1 eq stats then pkg
+        else
+          regroupByPackage(pkg, stats1)
       case t => t
     }
+
+  private def regroupByPackage(pkg: PackageDef, stats: List[Tree])(using Context): Tree =
+    val grouped = stats.groupBy(tree => tree.symbol.enclosingPackageClass)
+
+    // We need to copy the existing package so we don't lose any attachments
+    // e.g. attachments used to calculate Wunused
+    cpy.PackageDef(pkg)(Ident(defn.EmptyPackageVal.namedType),
+      grouped.getOrElse(defn.RootClass, List()) :::
+      grouped.getOrElse(defn.EmptyPackageClass, List()) :::
+      grouped
+        .toList
+        .filter((pk, stmts) => pk != defn.RootClass && pk != defn.EmptyPackageClass)
+        .map((pkg, stmts) => tpd.PackageDef(Ident(pkg.sourceModule.namedType), stmts))
+    ).withType(defn.EmptyPackageVal.namedType)
 
   private def collectReferencedSpecializations(stats: List[Tree], specializations: SpecializationCache)(using Context): SpecializationCache =
     stats.foldLeft(specializations) {
