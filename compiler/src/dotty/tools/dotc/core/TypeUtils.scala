@@ -71,6 +71,11 @@ class TypeUtils:
                            // otherwise rely on the default case below to print unaliased tuples.
           case tp: SingletonType =>
             if tp.termSymbol == defn.EmptyTupleModule then Some(Nil) else None
+          case tp: TypeProxy if !tp.typeSymbol.isClass =>
+            if normalize then
+              val st = tp.superType
+              if st ne tp then recur(st, bound) else None
+            else None
           case _ =>
             if defn.isTupleClass(tp.typeSymbol) && !normalize then Some(tp.dealias.argInfos)
             else None
