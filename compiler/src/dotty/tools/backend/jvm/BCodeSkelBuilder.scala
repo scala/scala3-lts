@@ -156,7 +156,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
 
     /* ---------------- idiomatic way to ask questions to typer ---------------- */
 
-    def paramTKs(app: Apply, take: Int = -1): List[BType] = app match {
+    def paramTKs(app: Apply): List[BType] = if app.args.isEmpty then Nil else app match {
       case Apply(fun, _) =>
       val funSym = fun.symbol
       (funSym.info.firstParamTypes map toTypeKind) // this tracks mentioned inner classes (in innerClassBufferASM)

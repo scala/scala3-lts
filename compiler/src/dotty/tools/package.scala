@@ -8,6 +8,18 @@ package object tools {
   def unsupported(methodName: String): Nothing =
     throw new UnsupportedOperationException(methodName)
 
+  /**
+   * Allows one to lazily initialize values without explicit `.nn`.
+   * This is useful for values that need a Context and thus can't be `lazy val`s.
+   */
+  inline def initialize[T](getter: T | Null, inline setter: T => Unit, inline value: => T): T =
+    if getter != null then
+      getter.nn
+    else
+      val res = value
+      setter(res)
+      res
+
   /** Forward-ported from the explicit-nulls branch. */
   extension [T](x: T | Null)
     /** Should be used when we know from the context that `x` is not null.
