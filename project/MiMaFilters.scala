@@ -17,6 +17,12 @@ object MiMaFilters {
         ProblemFilters.exclude[DirectMissingMethodProblem]("scala.collection.ArrayOps.scala$collection$ArrayOps$$elemTag$extension"),
         ProblemFilters.exclude[MissingFieldProblem]("scala.language#experimental.safe"),
         ProblemFilters.exclude[MissingClassProblem]("scala.language$experimental$safe$"),
+        ProblemFilters.exclude[MissingFieldProblem]("scala.language#experimental.specializedTraits"),
+        ProblemFilters.exclude[MissingClassProblem]("scala.language$experimental$specializedTraits$"),
+        ProblemFilters.exclude[MissingFieldProblem]("scala.language#experimental.inlineTraits"),
+        ProblemFilters.exclude[MissingClassProblem]("scala.language$experimental$inlineTraits$"),
+        ProblemFilters.exclude[MissingFieldProblem]("scala.runtime.stdLibPatches.language#experimental.specializedTraits"),
+        ProblemFilters.exclude[MissingClassProblem]("scala.runtime.stdLibPatches.language$experimental$specializedTraits$"),
         // new annotation encoding capture checking's `x.except[C]` capabilities
         ProblemFilters.exclude[MissingClassProblem]("scala.annotation.internal.exceptCapability"),
     ))

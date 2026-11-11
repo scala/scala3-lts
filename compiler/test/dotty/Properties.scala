@@ -65,6 +65,12 @@ object Properties {
   /** scala-asm jar */
   def scalaAsm: String = sys.props("dotty.tests.classes.scalaAsm").nn
 
+  /** jline-terminal jar */
+  def jlineTerminal: String = sys.props("dotty.tests.classes.jlineTerminal").nn
+
+  /** jline-reader jar */
+  def jlineReader: String = sys.props("dotty.tests.classes.jlineReader").nn
+
   /** scala-xml jar */
   def scalaXml: String = sys.props("dotty.tests.classes.scalaXml").nn
 
