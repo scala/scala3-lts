@@ -260,7 +260,7 @@ object Contexts {
         report.error(s"expected file, received directory '${file.path}'")
         NoSource
       else
-        base.sources.getOrElseUpdate(file, SourceFile(file, codec))
+        base.sources.getOrElseUpdate(file, SourceFile(file, settings.sourceroot.value, codec))
     }
 
     /** SourceFile with given path, memoized */
