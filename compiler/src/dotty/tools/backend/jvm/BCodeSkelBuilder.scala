@@ -23,6 +23,7 @@ import dotty.tools.dotc.core.NameOps.isStaticConstructorName
 import tpd.*
 
 import scala.compiletime.uninitialized
+import scala.tools.asm.tree.MethodNode
 
 /*
  *
@@ -421,7 +422,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
       claszSymbol.info.decls.filter(p => p.isTerm && !p.is(Method)).foreach(addClassField)
 
     // current method
-    var mnode: MethodNode1         = uninitialized
+    var mnode: MethodNode          = uninitialized
     var returnType: BType          = uninitialized
     var methSymbol: Symbol         = uninitialized
     // used by genLoadTry() and genSynchronized()
@@ -731,7 +732,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
         mdesc,
         jgensig,
         mkArrayS(thrownExceptions)
-      ).asInstanceOf[MethodNode1]
+      ).asInstanceOf[MethodNode]
 
       // TODO param names: (m.params.map(p => javaName(p.sym)))
 
@@ -936,7 +937,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
 
       TraceUtils.traceMethodIfRequested(mnode)
 
-      mnode = null.asInstanceOf[MethodNode1] // for GC
+      mnode = null.asInstanceOf[MethodNode] // for GC
     } // end of method genDefDef()
 
     def emitLocalVarScope(sym: Symbol, start: asm.Label, end: asm.Label, force: Boolean = false): Unit = {
