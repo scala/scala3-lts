@@ -423,7 +423,6 @@ trait BCodeSkelBuilder extends BCodeHelpers {
     // current method
     var mnode: MethodNode1         = uninitialized
     var jMethodName: String        = uninitialized
-    private var isMethSymStaticCtor = false
     var returnType: BType          = uninitialized
     var methSymbol: Symbol         = uninitialized
     // used by genLoadTry() and genSynchronized()
@@ -719,7 +718,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
       val thrownExceptions: List[String] = getExceptions(excs)
 
       val bytecodeName =
-        if (isMethSymStaticCtor) CLASS_CONSTRUCTOR_NAME
+        if (methSymbol.name.isStaticConstructorName) CLASS_CONSTRUCTOR_NAME
         else jMethodName
 
       val lengthOk = if jgensig ne null then BCodeUtils.checkConstantStringLength(jgensig)
@@ -821,7 +820,6 @@ trait BCodeSkelBuilder extends BCodeHelpers {
       methSymbol  = dd.symbol
       jMethodName = methSymbol.javaSimpleName
       returnType  = bTypeLoader.methodBTypeFromSymbol(methSymbol).returnType
-      isMethSymStaticCtor = methSymbol.name.isStaticConstructorName
 
       resetMethodBookkeeping(dd)
 
