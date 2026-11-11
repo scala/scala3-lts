@@ -307,7 +307,7 @@ object Implicits:
   class ContextualImplicits(
       val refs: List[ImplicitRef],
       val outerImplicits: ContextualImplicits | Null,
-      val isImport: Boolean)(initctx: Context) extends ImplicitRefs(initctx) {
+      val importInfo: ImportInfo | Null)(initctx: Context) extends ImplicitRefs(initctx) {
     private val eligibleCache = EqHashMap[Type, List[Candidate]]()
 
     /** The level increases if current context has a different owner or scope than
@@ -321,7 +321,7 @@ object Implicits:
 
       if outerImplicits == null then 1
       else if migrateTo3(using irefCtx)
-              || isSameOwner && (isImport || isSameScope && !isLazyImplicit)
+              || isSameOwner && ((importInfo ne null) || isSameScope && !isLazyImplicit)
       then outerImplicits.uncheckedNN.level
       else outerImplicits.uncheckedNN.level + 1
     end level
@@ -335,14 +335,14 @@ object Implicits:
     }
 
     def bindingPrec: BindingPrec =
-      if isImport then if ctx.importInfo.uncheckedNN.isWildcardImport then WildImport else NamedImport else Definition
+      if importInfo != null then if importInfo.isWildcardImport then WildImport else NamedImport else Definition
 
     private def combineEligibles(ownEligible: List[Candidate], outerEligible: List[Candidate]): List[Candidate] =
       if ownEligible.isEmpty then outerEligible
       else if outerEligible.isEmpty then ownEligible
       else
         val ownNames = mutable.Set(ownEligible.map(_.ref.implicitName)*)
-        val outer = outerImplicits.uncheckedNN
+        val outer = outerImplicits.nn
         if !migrateTo3(using irefCtx) && level == outer.level && outer.bindingPrec.beats(bindingPrec) then
           val keptOuters = outerEligible.filterConserve: cand =>
             if ownNames.contains(cand.ref.implicitName) then
@@ -409,7 +409,7 @@ object Implicits:
         val outerExcluded = outerImplicits.nn.exclude(root)
         if (irefCtx.importInfo.nn.site.termSymbol == root) outerExcluded
         else if (outerExcluded eq outerImplicits) this
-        else new ContextualImplicits(refs, outerExcluded, isImport)(irefCtx)
+        else new ContextualImplicits(refs, outerExcluded, importInfo)(irefCtx)
       }
   }
 
@@ -1797,9 +1797,7 @@ trait Implicits:
                     // Otherwise, proceed with a search of the implicit scope.
                     val newCtxImplicits =
                       if eligible eq preEligible then null
-                      else ctxImplicits.nn.outerImplicits: ContextualImplicits | Null
-                        // !!! Dotty problem: without the ContextualImplicits | Null type ascription
-                        // we get a Ycheck failure after arrayConstructors due to "Types differ"
+                      else ctxImplicits.nn.outerImplicits
                     searchImplicit(newCtxImplicits, SearchMode.New).recoverWith:
                       failure2 => failure2.reason match
                         case _: AmbiguousImplicits => failure2

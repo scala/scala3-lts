@@ -283,7 +283,8 @@ class Typer(@constructorOnly nestingLevel: Int = 0) extends Namer
           // wildcard imports, provided both are in contexts with same scope
           found
         else if newPrec == WildImport && ctx.outersIterator.exists: ctx =>
-          ctx.isImportContext && namedImportRef(ctx.importInfo.uncheckedNN).exists
+          val importInfo = ctx.importInfoIfImportContext
+          (importInfo `ne` null) && namedImportRef(importInfo).exists
         then
           // Don't let two ambiguous wildcard imports rule over
           // a winning named import. See pos/i18529.
@@ -318,8 +319,8 @@ class Typer(@constructorOnly nestingLevel: Int = 0) extends Namer
           then
             altImports.uncheckedNN += altImp
 
-        if altImports != null && ctx.isImportContext then
-          val curImport = ctx.importInfo.uncheckedNN
+        val curImport = ctx.importInfoIfImportContext
+        if altImports != null && curImport != null then
           namedImportRef(curImport) match
             case altImp: TermRef =>
               if prevPrec == WildImport then
@@ -554,15 +555,15 @@ class Typer(@constructorOnly nestingLevel: Int = 0) extends Namer
           else {  // find import
             val outer = ctx.outer
             val curImport = ctx.importInfo
-            def updateUnimported() =
-              if (curImport.nn.unimported ne NoSymbol) unimported += curImport.nn.unimported
             if (curOwner.is(Package) && curImport != null && curImport.isRootImport && previous.exists)
               previous // no more conflicts possible in this case
-            else if (isPossibleImport(NamedImport) && (curImport ne outer.importInfo)) {
+            else if (isPossibleImport(NamedImport) && curImport != null && (curImport ne outer.importInfo)) {
+              def updateUnimported() =
+                if (curImport.unimported ne NoSymbol) unimported += curImport.unimported
               val namedImp = namedImportRef(curImport.uncheckedNN)
               if (namedImp.exists)
                 checkImportAlternatives(namedImp, NamedImport, ctx)(using outer)
-              else if (isPossibleImport(WildImport) && !curImport.nn.importSym.isCompleting) {
+              else if (isPossibleImport(WildImport) && !curImport.importSym.isCompleting) {
                 val wildImp = wildImportRef(curImport.uncheckedNN)
                 if (wildImp.exists)
                   checkImportAlternatives(wildImp, WildImport, ctx)(using outer)
