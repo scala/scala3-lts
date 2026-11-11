@@ -326,7 +326,7 @@ trait BCodeHelpers(val bTypeLoader: BTypeLoader) extends BCodeIdiomatic {
         mirrorMethodName,
         mdesc,
         jgensig,
-        mkArrayS(thrownExceptions)
+        if thrownExceptions.isEmpty then null else thrownExceptions.toArray
       )
 
       BCAnnotGen.emitAnnotations(mirrorMethod, others)
