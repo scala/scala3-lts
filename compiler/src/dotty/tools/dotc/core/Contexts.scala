@@ -43,6 +43,7 @@ import java.nio.file.InvalidPathException
 import dotty.tools.dotc.coverage.Coverage
 import dotty.tools.dotc.rewrites.Rewrites
 import scala.annotation.tailrec
+import dotty.tools.dotc.inlines.Inlines.InlineTraitState
 
 object Contexts {
 
@@ -147,6 +148,7 @@ object Contexts {
     def typerState: TyperState
     def gadt: GadtConstraint = gadtState.gadt
     def gadtState: GadtState
+    def inlineTraitState: InlineTraitState
     def searchHistory: SearchHistory
     def source: SourceFile
 
@@ -433,6 +435,7 @@ object Contexts {
       superOrThisCallContext(owner, constrCtx.scope)
         .setTyperState(typerState)
         .setGadtState(gadtState)
+        .setInlineTraitState(inlineTraitState)
         .fresh
         .setScope(this.scope)
     }
@@ -600,6 +603,9 @@ object Contexts {
 
     private var _gadtState: GadtState = uninitialized
     final def gadtState: GadtState = _gadtState
+    
+    private var _inlineTraitState: InlineTraitState = uninitialized
+    final def inlineTraitState: InlineTraitState = _inlineTraitState
 
     private var _searchHistory: SearchHistory = uninitialized
     final def searchHistory: SearchHistory = _searchHistory
@@ -625,6 +631,7 @@ object Contexts {
       _tree = origin.tree
       _scope = origin.scope
       _gadtState = origin.gadtState
+      _inlineTraitState = origin.inlineTraitState
       _searchHistory = origin.searchHistory
       _source = origin.source
       _moreProperties = origin.moreProperties
@@ -687,6 +694,11 @@ object Contexts {
       this
     def setFreshGADTBounds: this.type =
       setGadtState(gadtState.fresh)
+
+    def setInlineTraitState(inlineTraitState: InlineTraitState): this.type =
+      util.Stats.record("Context.setInlineTraitState")
+      this._inlineTraitState = inlineTraitState
+      this
 
     def setSearchHistory(searchHistory: SearchHistory): this.type =
       util.Stats.record("Context.setSearchHistory")
@@ -782,6 +794,7 @@ object Contexts {
           .updated(profilerLoc, Profiler.NoOp)
       c._searchHistory = new SearchRoot
       c._gadtState = GadtState(GadtConstraint.empty)
+      c._inlineTraitState = InlineTraitState()
       c
   end FreshContext
 
