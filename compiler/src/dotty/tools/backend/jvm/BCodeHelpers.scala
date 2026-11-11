@@ -484,7 +484,7 @@ trait BCodeHelpers(val bTypeLoader: BTypeLoader) extends BCodeIdiomatic {
      *
      * @see    https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.4
      */
-    def getGenericSignature(sym: Symbol, owner: Symbol, descriptor: String | Null)(using Context): String | Null = {
+    def getGenericSignature(sym: Symbol, descriptor: String | Null)(using Context): String | Null = {
       atPhase(erasurePhase) {
         // Finding the member's type is nontrivial because of erasure and how it interacts with other phases.
         def computeMemberType(): Type = {
@@ -514,12 +514,12 @@ trait BCodeHelpers(val bTypeLoader: BTypeLoader) extends BCodeIdiomatic {
                 case Some(ExprType(genericInfo)) => return genericInfo // since we're looking for the getter, we get an ExprType
                 case _ => ()
 
-          owner.denot.thisType.memberInfo(sym)
+          sym.owner.denot.thisType.memberInfo(sym)
         }
 
         if ctx.base.settings.XnoGenericSig.value then null
         else
-          val genSig = getGenericSignatureHelper(sym, owner, computeMemberType())
+          val genSig = getGenericSignatureHelper(sym, computeMemberType())
           if genSig == null || (descriptor != null && descriptor.contentEquals(genSig)) then null
           else genSig.toString
       }
@@ -540,7 +540,7 @@ trait BCodeHelpers(val bTypeLoader: BTypeLoader) extends BCodeIdiomatic {
     }
 
     private def verifySignature(sym: Symbol, sig: String)(using Context): Unit = {
-      import org.objectweb.asm.util.CheckClassAdapter
+      import scala.tools.asm.util.CheckClassAdapter
       def wrap(body: => Unit): Unit = {
         try body
         catch case ex: Exception =>
