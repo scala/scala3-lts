@@ -422,7 +422,6 @@ trait BCodeSkelBuilder extends BCodeHelpers {
 
     // current method
     var mnode: MethodNode1         = uninitialized
-    var jMethodName: String        = uninitialized
     var returnType: BType          = uninitialized
     var methSymbol: Symbol         = uninitialized
     // used by genLoadTry() and genSynchronized()
@@ -719,7 +718,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
 
       val bytecodeName =
         if (methSymbol.name.isStaticConstructorName) CLASS_CONSTRUCTOR_NAME
-        else jMethodName
+        else methSymbol.javaSimpleName
 
       val lengthOk = if jgensig ne null then BCodeUtils.checkConstantStringLength(jgensig)
                                         else BCodeUtils.checkConstantStringLength(bytecodeName, mdesc)
@@ -818,7 +817,6 @@ trait BCodeSkelBuilder extends BCodeHelpers {
       assert(mnode == null, "GenBCode detected nested method.")
 
       methSymbol  = dd.symbol
-      jMethodName = methSymbol.javaSimpleName
       returnType  = bTypeLoader.methodBTypeFromSymbol(methSymbol).returnType
 
       resetMethodBookkeeping(dd)
