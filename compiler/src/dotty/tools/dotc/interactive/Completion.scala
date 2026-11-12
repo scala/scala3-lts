@@ -18,7 +18,7 @@ import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.SymDenotations.SymDenotation
 import dotty.tools.dotc.core.TypeError
 import dotty.tools.dotc.core.Phases
-import dotty.tools.dotc.core.Types.{AppliedType, ExprType, MethodOrPoly, NameFilter, NoType, RefinedType, TermRef, Type, TypeProxy}
+import dotty.tools.dotc.core.Types.{AppliedType, ExprType, MatchType, MethodOrPoly, NameFilter, NoType, RefinedType, TermRef, Type, TypeProxy}
 import dotty.tools.dotc.parsing.Tokens
 import dotty.tools.dotc.typer.Implicits.SearchSuccess
 import dotty.tools.dotc.typer.Inferencing
@@ -475,12 +475,20 @@ object Completion:
       CompletionResult(resultMappings, renames.toMap)
     end scopeCompletions
 
-    /** Widen only those types which are applied or are exactly nothing
+    /** Widen only those types which are applied or are exactly nothing.
+     *  Match aliases are not expanded by `widenDealias`, and `memberNames` lists
+     *  members of a match type's bound rather than of its reduction.
      */
     def widenQualifier(qual: tpd.Tree)(using Context): tpd.Tree =
       qual.typeOpt.widenDealias match
         case widenedType if widenedType.isExactlyNothing => qual.withType(widenedType)
-        case appliedType: AppliedType => qual.withType(appliedType)
+        case app: AppliedType =>
+          val normalized = if app.isMatchAlias then app.tryNormalize else NoType
+          qual.withType(if normalized.exists then normalized else app)
+        case mt: MatchType =>
+          mt.tryNormalize match
+            case reduced if reduced.exists => qual.withType(reduced)
+            case _ => qual
         case _ => qual
 
     /** Completions for selections from a term.
