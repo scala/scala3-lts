@@ -1,9 +1,3 @@
--- Warning: tests/warn/optimizer-warnings.scala:3:7 --------------------------------------------------------------------
-3 |object Test: // warn
-  |       ^
-  |  there was a problem determining if method <init> can be inlined: 
-  |  The inline information for scala/runtime/ModuleSerializationProxy::<init>(Ljava/lang/Class;)V may be incomplete:
-  |  The Scala classfile scala/runtime/ModuleSerializationProxy does not have a Scala3InlineInfo attribute.
 -- Warning: tests/warn/optimizer-warnings.scala:5:37 -------------------------------------------------------------------
 5 |    val (a, b) = n match { case 0 => (1, 2); case _ => (3, 4) }; a + b // warn // warn // warn // warn
   |                                     ^^^^^^
