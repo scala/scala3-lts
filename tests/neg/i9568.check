@@ -4,7 +4,7 @@
    |          No given instance of type => Monad[F] was found for parameter ev of method blaMonad in object Test.
    |          I found:
    |
-   |              Test.blaMonad[F², S](Test.blaMonad[F³, S²])
+   |              Test.blaMonad[F², S](using Test.blaMonad[F³, S²])
    |
    |          But method blaMonad in object Test does not match type => Monad[F²]
    |

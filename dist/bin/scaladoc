@@ -65,6 +65,7 @@ classpathArgs () {
   CLASS_PATH+="$(find_lib "*flexmark-ext-anchorlink*")$PSEP"
   CLASS_PATH+="$(find_lib "*flexmark-ext-autolink*")$PSEP"
   CLASS_PATH+="$(find_lib "*flexmark-ext-emoji*")$PSEP"
+  CLASS_PATH+="$(find_lib "*flexmark-ext-footnotes*")$PSEP"
   CLASS_PATH+="$(find_lib "*flexmark-ext-gfm-strikethrough*")$PSEP"
   CLASS_PATH+="$(find_lib "*flexmark-ext-gfm-tasklist*")$PSEP"
   CLASS_PATH+="$(find_lib "*flexmark-ext-wikilink*")$PSEP"
