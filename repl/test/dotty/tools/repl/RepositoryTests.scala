@@ -45,7 +45,7 @@ class RepositoryTests extends ReplTest:
       stateAfterRepository
     } andThen {
       run(s":dep $dependency")
-      assertEquals("Resolved a dependency (1 JARs)", storedOutput().trim)
+      assertEquals("Resolved 1 dependencies (1 JARs)", storedOutput().trim)
     }
 
   @Test def `repository command reports what it cannot parse`: Unit =
@@ -63,6 +63,6 @@ class RepositoryTests extends ReplTest:
       run(s"//> using dep $dependency\n//> using repository $localRepository")
       assertEquals(
         s"""Added repository '$localRepository'.
-           |Resolved a dependency (1 JARs)""".stripMargin,
+           |Resolved 1 dependencies (1 JARs)""".stripMargin,
         storedOutput().trim
       )
