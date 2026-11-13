@@ -1205,7 +1205,7 @@ object Build {
       Compile / sources := Seq(),
       Test / scalaSource := baseDirectory.value,
       Test / javaSource := baseDirectory.value,
-      libraryDependencies += ("org.scala-sbt" %% "zinc-apiinfo" % "1.12.0" % Test).cross(CrossVersion.for3Use2_13)
+      libraryDependencies += ("org.scala-sbt" %% "zinc-apiinfo" % "1.12.1" % Test).cross(CrossVersion.for3Use2_13)
     )
 
   lazy val `scala3-presentation-compiler` = project.in(file("presentation-compiler"))
