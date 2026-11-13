@@ -929,6 +929,7 @@ object Build {
           s"-Ddotty.tools.dotc.semanticdb.test=${(ThisBuild / baseDirectory).value/"tests"/"semanticdb"}",
         )
       },
+      Test / javaOptions += s"-Ddotty.tests.scalaCliVersion=${Dependencies.scalaCliLauncherVersion}",
       run / fork := true,
       excludeDependencies += "org.scala-lang" %% "scala3-library",
       excludeDependencies += "org.scala-lang" % "scala-library",
