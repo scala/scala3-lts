@@ -24,3 +24,4 @@ spurious-overload.scala
 tailrec.scala
 traitParams.scala
 i10174b.scala
+optimizer-warnings.scala

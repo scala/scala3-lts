@@ -157,13 +157,14 @@ class BTypesFromClassfile(byteCodeRepository: BCodeRepository, bTypeLoader: BTyp
   }
 
   def loadInlineInfoFor(name: InternalName): InlineInfo =
-    byteCodeRepository.classNode(name) match {
+    if OptimizerUtils.isSCoverage(name) then InlineInfo.empty
+    else byteCodeRepository.classNode(name) match {
       case Right(classNode, moduleNode) =>
         inlineInfoFromClassfile(classNode, moduleNode)
       case Left(missingClass) =>
         InlineInfo.empty.copy(warning = Some(ClassNotFoundWhenBuildingInlineInfoFromSymbol(missingClass)))
     }
-  
+
   /**
    * Build the InlineInfo for a class. For Scala classes, the information is stored in the
    * inline info attribute. If the attribute is missing or is an empty stub (libraries compiled
