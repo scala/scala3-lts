@@ -924,6 +924,7 @@ object Contexts {
 
   @sharable val NoContext: Context = new FreshContext((null: ContextBase | Null).uncheckedNN) {
     override val implicits: ContextualImplicits = new ContextualImplicits(Nil, null, null)(this: @unchecked)
+    override val importInfo: ImportInfo | Null = null
     setSource(NoSource)
   }
 
