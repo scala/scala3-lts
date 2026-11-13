@@ -288,7 +288,7 @@ class OptimizerUtils(val ts: OptimizerKnownBTypes) {
     }
     if (numCallsOrNew > 1 || numBoxConv > paramTypes.length + 1) -1
     else if (numCallsOrNew == 0) if (numBoxConv == 0) 1 else 3
-    else if (callMi.nn.name == GenBCode.INSTANCE_CONSTRUCTOR_NAME) 2 // if numCallsOrNew > 0 then callMi is nonnull
+    else if (callMi.nn.name == BCodeUtils.INSTANCE_CONSTRUCTOR_NAME) 2 // if numCallsOrNew > 0 then callMi is nonnull
     else if (numBoxConv > 0) 3
     else 4
   }

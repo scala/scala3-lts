@@ -730,7 +730,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
       val thrownExceptions: List[String] = BCForwardersGen.getExceptions(excs)
 
       val bytecodeName =
-        if (methSymbol.name.isStaticConstructorName) CLASS_CONSTRUCTOR_NAME
+        if (methSymbol.name.isStaticConstructorName) BCodeUtils.CLASS_CONSTRUCTOR_NAME
         else methSymbol.javaSimpleName
 
       val lengthOk = if jgensig ne null then BCodeUtils.checkConstantStringLength(jgensig)
@@ -743,7 +743,7 @@ trait BCodeSkelBuilder extends BCodeHelpers {
         bytecodeName,
         mdesc,
         jgensig,
-        mkArrayS(thrownExceptions)
+        if thrownExceptions.isEmpty then null else thrownExceptions.toArray
       ).asInstanceOf[MethodNode]
 
       BCAnnotGen.emitAnnotations(mnode, others)
