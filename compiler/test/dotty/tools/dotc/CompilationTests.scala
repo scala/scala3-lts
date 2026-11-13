@@ -464,7 +464,7 @@ class CompilationTests {
       if expectError then
         t.checkExpectedErrors()
       else
-        runWithCoverageOrFallback[PosTestWithCoverage](t, "Pos")
+        runWithCoverageOrFallback[PosTestWithCoverage](t)
       allTests ::= t
     }
     try
