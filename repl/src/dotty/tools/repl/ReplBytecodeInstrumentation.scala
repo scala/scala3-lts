@@ -1,8 +1,6 @@
 package dotty.tools
 package repl
 
-import scala.language.unsafeNulls
-
 import scala.tools.asm.*
 import scala.tools.asm.Opcodes.*
 import scala.tools.asm.tree.*
@@ -39,8 +37,8 @@ object ReplBytecodeInstrumentation:
       access: Int,
       name: String,
       descriptor: String,
-      signature: String,
-      exceptions: Array[String]
+      signature: String | Null,
+      exceptions: Array[String] | Null
     ): MethodVisitor =
       new InstrumentMethodVisitor(super.visitMethod(access, name, descriptor, signature, exceptions))
 
