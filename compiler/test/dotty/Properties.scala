@@ -10,7 +10,7 @@ object Properties {
     sys.props.getOrElse(name, "FALSE") == "TRUE"
 
   /** Are we running on the CI? */
-  val isRunByCI: Boolean = sys.env.isDefinedAt("DOTTY_CI_RUN")
+  val isRunByCI: Boolean = sys.env.isDefinedAt("CI")
 
   /** Filter out tests not matching the regex supplied by "dotty.tests.filter"
    *  define
