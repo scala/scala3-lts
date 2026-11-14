@@ -35,8 +35,10 @@ object GenericSignatures {
    *  @return The signature if it could be generated, `null` otherwise.
    */
   def javaSig(sym0: Symbol, info: Type, onClassRef: ClassSymbol => Unit)(using Context): StringBuilder | Null =
-    if mayNeedSignature(sym0, info) then atPhase(erasurePhase)(javaSig0(sym0, info, onClassRef))
-    else null
+    atPhase(erasurePhase){
+      if mayNeedSignature(sym0, info) then javaSig0(sym0, info, onClassRef)
+      else null
+    }
 
   private def mayNeedSignature(sym0: Symbol, info: Type)(using Context) = {
     def mayNeedSignature(t: Type): Boolean = t match
