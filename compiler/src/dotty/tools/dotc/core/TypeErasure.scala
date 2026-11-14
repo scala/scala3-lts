@@ -1085,7 +1085,13 @@ class TypeErasure(sourceLanguage: SourceLanguage, semiEraseVCs: Boolean, isConst
     else
       apply(tp)
 
-  /** True if a result type should erase to JVM void. */
+  /** True if a result type should erase to JVM void.
+   *
+   *  `isRef(UnitClass)` covers `Unit` and aliases of `Unit` without full equality.
+   *  `=:=` is kept for remaining Unit-equivalent types, but must not be used on
+   *  class TypeRefs: comparing them to `Unit` forces base classes, which is cyclic
+   *  for nested self-typed traits loaded from TASTy (#26959, introduced by #26252).
+   */
   private def isErasedToVoid(tp: Type)(using Context): Boolean =
     tp.isRef(defn.UnitClass) || nonClassEqUnit(tp)
 
