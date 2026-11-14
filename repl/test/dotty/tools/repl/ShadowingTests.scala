@@ -25,7 +25,7 @@ import vulpix.{TestConfiguration, TestFlags}
 object ShadowingTests:
   def classpath = TestConfiguration.replClassPath + File.pathSeparator + shadowDir
   def options = ReplTest.commonOptions ++ Array("-classpath", classpath)
-  def shadowDir = dir.toAbsolutePath.toString
+  def shadowDir = dir.nn.toAbsolutePath.toString
 
   def createSubDir(name: String): Path =
     val subdir = dir.nn.resolve(name)
