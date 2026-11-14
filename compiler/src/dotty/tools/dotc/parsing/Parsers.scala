@@ -748,12 +748,12 @@ object Parsers {
     var possibleColonOffset: Int = -1
 
     def testChar(idx: Int, p: Char => Boolean): Boolean = {
-      val txt = source.content
+      val txt = source.textContent()
       idx >= 0 && idx < txt.length && p(txt(idx))
     }
 
     def testChar(idx: Int, c: Char): Boolean = {
-      val txt = source.content
+      val txt = source.textContent()
       idx >= 0 && idx < txt.length && txt(idx) == c
     }
 
@@ -822,9 +822,9 @@ object Parsers {
         patch(source, Span(startOpening, endOpening), " {")
         val next = in.next
         def closedByEndMarker =
-          next.token == END && (next.offset - next.lineOffset) == indentWidth.toPrefix.size
+          next.token == END && (next.offset - next.lineOffset) == indentWidth.toPrefixSize
         if closedByEndMarker then patch(source, Span(next.offset), "} // ")
-        else patch(source, Span(closingOffset(source.nextLine(in.lastOffset))), indentWidth.toPrefix ++ "}\n")
+        else patch(source, Span(closingOffset(source.nextLine(in.lastOffset))), indentWidth.toPrefix + "}\n")
       t
     end indentedToBraces
 
@@ -2958,7 +2958,7 @@ object Parsers {
               val span = Span(start, in.lastOffset)
               warning(IllegalLiteral(), start)
               unpatch(ctx.compilationUnit.source, span)
-              val text = new String(source.content, start, span.end - start)
+              val text = source.textContent().substring(start, span.end)
               patch(span, s"($text)")
             case _ =>
           in.nextToken()
