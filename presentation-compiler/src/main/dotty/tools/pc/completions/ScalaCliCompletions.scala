@@ -35,7 +35,7 @@ class ScalaCliCompletions(
     val (editStart, editEnd) = CoursierComplete.inferEditRange(pos.point, text)
     val editRange = pos.withStart(editStart).withEnd(editEnd).toLsp
     val normalized = dependency.nn.replace(":::", ":").nn.replace("::", ":").nn
-    val isVersionCompletion = normalized.split(":").nn.length >= 3
+    val isVersionCompletion = normalized.count(_ == ':') >= 2
     completions
       .map(insertText =>
         CompletionValue.Coursier(
