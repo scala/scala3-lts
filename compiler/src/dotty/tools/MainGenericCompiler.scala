@@ -90,7 +90,7 @@ object MainGenericCompiler {
   val classpathSeparator = File.pathSeparator
 
   @sharable val javaOption = raw"""-J(.*)""".r
-  @sharable val javaPropOption = raw"""-D(.+?)=(.?)""".r
+  @sharable val javaPropOption = raw"""-D([^=]+)=(.*)""".r
   @tailrec
   def process(args: List[String], settings: CompileSettings): CompileSettings = args match
     case Nil =>
