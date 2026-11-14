@@ -113,7 +113,7 @@ object Texts {
     private def stripTrailingSpaces(s: String): String =
       var end = s.length
       while end > 0 && s.charAt(end - 1) == ' ' do end -= 1
-      if end == s.length then s else s.substring(0, end)
+      if end == s.length then s else s.substring(0, end).nn
     
     def print(sb: StringBuilder, numberWidth: Int): Unit = this match {
       case Str(s, lines) =>

@@ -107,7 +107,7 @@ object IndexedContext:
             name.trim.nn -> conflictingValue
           else
             name.trim.nn -> nonRoot
-    }
+      }
     val renames = scopeContext.renames
 
     def defaultScopes(name: Name): Option[List[Symbol]] =
