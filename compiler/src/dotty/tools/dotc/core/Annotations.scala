@@ -2,11 +2,12 @@ package dotty.tools
 package dotc
 package core
 
-import Symbols.*, Types.*, Contexts.*, Constants.*, Phases.*
+import Symbols.*, Types.*, Contexts.*, Constants.*, Phases.*, NameKinds.*
 import ast.tpd, tpd.*
 import util.Spans.Span
 import printing.{Showable, Printer}
 import printing.Texts.Text
+import dotty.tools.dotc.core.StdNames.nme
 
 import scala.annotation.internal.sharable
 
@@ -37,15 +38,29 @@ object Annotations {
     /** All term arguments of this annotation in a single flat list */
     def arguments(using Context): List[Tree] = tpd.allTermArguments(tree)
 
-    def argument(i: Int)(using Context): Option[Tree] = {
+    def argument(i: Int)(using Context): Option[Tree] =
       val args = arguments
-      if (i < args.length) Some(args(i)) else None
-    }
+      if i < args.length then Some(args(i)) else None
+
+    def hasExplicitArgument(i: Int)(using Context): Boolean =
+      argument(i) match
+        case Some(Select(Ident(_), DefaultGetterName(nme.CONSTRUCTOR, _))) => false
+        case Some(_) => true
+        case None => false
+
     def argumentConstant(i: Int)(using Context): Option[Constant] =
       for case ConstantType(c) <- argument(i).map(stripCast(_).tpe.widenTermRefExpr.normalized) yield c
 
     def argumentConstantString(i: Int)(using Context): Option[String] =
       for (case Constant(s: String) <- argumentConstant(i)) yield s
+
+    def argumentConstantSymbol(i: Int)(using Context): Option[String] =
+      argument(i) match
+        case Some(Apply(Select(Ident(nme.Symbol), nme.apply), Literal(Constant(s: String)) :: Nil)) => Some(s)
+        case _ => None
+
+    def argumentConstantStringOrSymbol(i: Int)(using Context): Option[String] =
+      argumentConstantString(i).orElse(argumentConstantSymbol(i))
 
     /** The tree evaluation is in progress. */
     def isEvaluating: Boolean = false
