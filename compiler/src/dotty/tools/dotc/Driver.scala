@@ -13,6 +13,8 @@ import util.chaining.*
 
 import fromtasty.{TASTYCompiler, TastyFileUtil}
 
+import scala.annotation.nowarn
+
 /** Run the Dotty compiler.
  *
  *  Extending this class lets you customize many aspect of the compilation
@@ -27,6 +29,7 @@ class Driver {
 
   protected def emptyReporter: Reporter = new StoreReporter(null)
 
+  @nowarn("msg=Catching StackOverflowError can lead to unexpected behavior") // yes, but we immediately exit
   protected def doCompile(compiler: Compiler, files: List[AbstractFile])(using Context): Reporter =
     if files.nonEmpty then
       var runOrNull = ctx.run
