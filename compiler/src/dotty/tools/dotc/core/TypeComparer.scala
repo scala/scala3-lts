@@ -3536,7 +3536,7 @@ object TypeComparer {
         def show: String =
           val lo = if low then " (left is approximated)" else ""
           val hi = if high then " (right is approximated)" else ""
-          lo ++ hi
+          lo + hi
   end ApproxState
   type ApproxState = ApproxState.Repr
 

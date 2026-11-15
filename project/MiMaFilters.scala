@@ -96,7 +96,10 @@ object MiMaFilters {
   object Interfaces {
     val ForwardsBreakingChanges: Map[String, Seq[ProblemFilter]] = Map(
       // Additions that require a new minor version of interfaces
-      Versions.mimaPreviousDottyVersion -> Seq.empty,
+      Versions.mimaPreviousDottyVersion -> Seq(
+        // SourceFile now has the (preferred) textContent to avoid copying to a char array
+        ProblemFilters.exclude[DirectMissingMethodProblem]("dotty.tools.dotc.interfaces.SourceFile.textContent"),
+      ),
     )
 
     val BackwardsBreakingChanges: Map[String, Seq[ProblemFilter]] = Map.empty
