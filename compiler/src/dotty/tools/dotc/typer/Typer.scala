@@ -55,6 +55,7 @@ import transform.CheckUnused.withOriginalName
 
 import scala.annotation.{unchecked as _, *}
 import dotty.tools.dotc.util.chaining.*
+import dotty.tools.dotc.printing.Formatting
 
 object Typer {
 
@@ -3152,7 +3153,7 @@ class Typer(@constructorOnly nestingLevel: Int = 0) extends Namer
                     report.error(em"deprecated parameter name must be distinct from other names", annot.tree.srcPos)
                   seen.addOne(nm)
                 case None =>
-                  report.error(em"the first argument of ${hl("@deprecatedName")} must be a constant", annot.tree.srcPos)
+                  report.error(em"the first argument of ${Formatting.hl("@deprecatedName")} must be a constant", annot.tree.srcPos)
           seen.addOne(p.name)
       checkNoForwardDependencies(vparams)
     if (sym.isOneOf(GivenOrImplicit)) checkImplicitConversionDefOK(sym)
