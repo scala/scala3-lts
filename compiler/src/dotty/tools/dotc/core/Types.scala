@@ -3490,6 +3490,7 @@ object Types extends TypeUtils {
       case wt: WildcardType => wt.optBounds match
         case tb: TypeBounds => WildcardType(FlexibleType.make(tb).asInstanceOf[TypeBounds])
         case _ => wt
+      case tl: TypeLambda => tl
       case other => FlexibleType(tp)
   end FlexibleType
 
