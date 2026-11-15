@@ -279,7 +279,7 @@ object Types extends TypeUtils {
      *  a non-bottom subclass of `cls`.
      */
     final def derivesFrom(cls: Symbol, defaultIfUnknown: Boolean = false)(using Context): Boolean = {
-      def isLowerBottomType(tp: Type) =
+      inline def isLowerBottomType(tp: Type) =
         tp.isBottomType
         && (tp.hasClassSymbol(defn.NothingClass)
             || cls != defn.NothingClass && !cls.isValueClass)
