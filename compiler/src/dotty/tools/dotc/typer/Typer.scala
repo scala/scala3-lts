@@ -3986,6 +3986,13 @@ class Typer(@constructorOnly nestingLevel: Int = 0) extends Namer
           * `SearchFailureType`.
           */
         def issueErrors(fun: Tree, args: List[Tree]): Tree =
+          
+          // If there are several arguments, some arguments might already
+          // have influenced the context, binding variables, but later ones
+          // might fail. In that case the constraint and instantiated variables
+          // need to be reset.
+          ctx.typerState.resetTo(saved)
+          
           // Prefer other errors over ambiguities. If nested in outer searches a missing
           // implicit can be healed by simply dropping this alternative and trying something
           // else. But an ambiguity is sticky and propagates outwards. If we have both
@@ -4020,12 +4027,6 @@ class Typer(@constructorOnly nestingLevel: Int = 0) extends Namer
 
         val args = implicitArgs(wtp.paramInfos, 0, pt)
         if (args.tpes.exists(_.isInstanceOf[SearchFailureType])) {
-          // If there are several arguments, some arguments might already
-          // have influenced the context, binding variables, but later ones
-          // might fail. In that case the constraint and instantiated variables
-          // need to be reset.
-          ctx.typerState.resetTo(saved)
-
           // If method has default params, fall back to regular application
           // where all inferred implicits are passed as named args.
           if hasDefaultParams then
