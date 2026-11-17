@@ -45,6 +45,7 @@ object Feature:
   val safe = experimental("safe")
   val specializedTraits = experimental("specializedTraits")
   val inlineTraits = experimental("inlineTraits")
+  val methodBlockEndMarkers = experimental("methodBlockEndMarkers")
 
   val nonViralExperimentalFeatures: Set[TermName] =
     Set(captureChecking, separationChecking, safe)
@@ -86,6 +87,7 @@ object Feature:
     (safe, "Require safe mode"),
     (inlineTraits, "Allow inline traits"),
     (specializedTraits, "Allow specialized traits"),
+    (methodBlockEndMarkers, "Enable experimental end markers for method blocks"),
   )
 
   /** Features that are now standard; the language import / -language choice is
