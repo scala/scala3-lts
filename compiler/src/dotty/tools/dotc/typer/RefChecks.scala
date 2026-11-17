@@ -1444,7 +1444,9 @@ class RefChecks extends MiniPhase { thisPhase =>
   override def transformSelect(tree: tpd.Select)(using Context): tpd.Tree =
     def shouldNotBeSynchronized(sym: Symbol): Boolean =
       sym.unforcedAnnotation(defn.JdkInternalValueBasedAnnot).nonEmpty ||
-        sym == defn.BoxedUnitClass // other boxed classes have the annotation; this one is defined by the Scala stdlib
+        // `@jdk.internal.ValueBased` only exists on JDK 16+, so also check boxed primitives explicitly
+        // (this also covers BoxedUnit, which is defined by the Scala stdlib)
+        defn.ScalaBoxedClasses().contains(sym)
 
     if tree.name == nme.synchronized_ && shouldNotBeSynchronized(tree.qualifier.tpe.typeSymbol) then
       report.warning(SynchronizedCallOnValueClass(tree), tree.srcPos)
