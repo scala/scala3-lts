@@ -25,9 +25,11 @@ class PostProcessor(classBTypeCache: ClassBType.Cache, bTypes: KnownBTypes)(usin
 
   private val classfileWriter: FileWriters.ClassfileWriter =
     FileWriters.ClassfileWriter(initctx.settings.outputDir.value, initctx.settings.XmainClass.valueSetByUser, initctx.settings.XjarCompressionLevel.value, initctx.settings.Xdumpclasses.value)
-
+  
   @annotation.nowarn("cat=deprecation")
-  final def sendToDisk(clazz: GeneratedClass): Unit = if !ctx.settings.YoutputOnlyTasty.value then {
+  private val outputOnlyTasty = initctx.settings.YoutputOnlyTasty.value
+  
+  final def sendToDisk(clazz: GeneratedClass): Unit = if !outputOnlyTasty then {
     val classNode = clazz.classNode
     runLocalOptimizations(classNode)
     setInnerClasses(classNode)
