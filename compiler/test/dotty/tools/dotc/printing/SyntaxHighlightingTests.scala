@@ -179,6 +179,6 @@ class SyntaxHighlightingTests extends DottyTest {
 
   @Test
   def hexPeriod = {
-    test("val n = 0x.", "<K|val> <D|n> = <L|0x>.")
+    test("val n = 0x.", "<K|val> <V|n> = <L|0x>.")
   }
 }
