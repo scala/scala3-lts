@@ -365,6 +365,9 @@ trait BCodeIdiomatic {
         jmethod.visitLdcInsn(java.lang.Double.valueOf(cst))
       }
     }
+    
+    final def nullconst(): Unit =
+      jmethod.visitInsn(Opcodes.ACONST_NULL)
 
     // can-multi-thread
     final def newarray(elem: BType): Unit = {

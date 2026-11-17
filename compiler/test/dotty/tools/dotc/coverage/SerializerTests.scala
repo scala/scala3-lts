@@ -4,8 +4,12 @@ import org.junit.Test
 import org.junit.Assert.*
 
 import java.io.StringWriter
+import java.nio.file.Paths
+import java.nio.file.Files
 
 class SerializerTests {
+  private val sourceRoot = Files.createTempDirectory("sourceRoot").nn
+
   @Test
   def basicStatementRoundtrips(): Unit =
     assertRoundtrips(Statement(
@@ -15,7 +19,7 @@ class SerializerTests {
         fullClassName = "my.package.MyClass",
         classType = "Class",
         methodName = "meth",
-        sourcePath = "somewhere.scala"
+        sourcePath = sourceRoot.resolve("somewhere.scala").nn
       ),
       id = 1,
       start = 10,
@@ -37,7 +41,7 @@ class SerializerTests {
         fullClassName = "my\npackage\\ with a weird\fname.My\rClass",
         classType = "Class",
         methodName = "meth\tod",
-        sourcePath = "/tmp/\nsomewhere\\.scala"
+        sourcePath = sourceRoot.resolve("/tmp/\nsomewhere\\.scala").nn
       ),
       id = 123,
       start = 456,
@@ -54,9 +58,9 @@ class SerializerTests {
     cov.addStatement(stmt)
 
     val writer = new StringWriter()
-    Serializer.serialize(cov, writer)
+    Serializer.serialize(cov, writer, sourceRoot)
 
-    val result = Serializer.deserialize(writer.toString.split('\n').iterator)
+    val result = Serializer.deserialize(writer.toString.split('\n').iterator, sourceRoot)
     assertEquals(1, result.statements.size)
     assertEquals(stmt, result.statements.head)
   }

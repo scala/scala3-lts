@@ -1296,7 +1296,7 @@ object Parsers {
             val d = digits
             if d.isEmpty then
               syntaxError(IllegalLiteral(), start)
-              Literal(Constant.fromValue(null))
+              Literal(Constant(null))
             else
               Number(d, kind)
           token match {
