@@ -2,7 +2,7 @@ trait Behavior[A]
 
 object Behavior:
   //implicit def mapBehavior[A: Behavior]: Behavior[List[A]] = new Behavior[List[A]] {}
-  given [A: Behavior] => Behavior[List[A]]
+  given [A: Behavior]: Behavior[List[A]] with {}
 
 object Model:
   case class Foo(i: Int)
@@ -10,7 +10,7 @@ object Model:
     given Behavior[Foo] = new Behavior[Foo] {}
     //implicit def dummy[A: Behavior](using s: String = "hello"): Option[A] = None
     //implicit def dummy[A: Behavior](using s: String = "hello")(using DummyImplicit): Option[A] = None
-    given [A: Behavior] => (s: String = "hello") => Option[A] = None
+    given [A: Behavior](using s: String = "hello"): Option[A] = None
 
 @main def Test =
   import Model.Foo
