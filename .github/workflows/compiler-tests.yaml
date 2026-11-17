@@ -211,7 +211,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
           cache: 'sbt'
-      - uses: VirtusLab/scala-cli-setup@2218d26d90fb8440c4cc125d89f787bcf711de56 # v1.17.0
+      - uses: VirtusLab/scala-cli-setup@c33dfbf1a5f16ee60efff453b7f9a987d2b6955b # v1.17.1
       - uses: sbt/setup-sbt@67d461eba2c4753196c230e02da850757ba4775e # v1.5.14
       - name: Test REPL on JDK ${{ matrix.jdk }}
         env:
