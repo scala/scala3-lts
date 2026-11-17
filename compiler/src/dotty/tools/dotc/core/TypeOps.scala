@@ -17,7 +17,6 @@ import typer.ProtoTypes.*
 import typer.ForceDegree
 import typer.Inferencing.*
 import typer.IfBottom
-import reporting.TestingReporter
 import cc.{CapturingType, derivedCapturingType, CaptureSet, isBoxed, isBoxedCapturing}
 import CaptureSet.{CompareResult, IdempotentCaptRefMap, IdentityCaptRefMap}
 
