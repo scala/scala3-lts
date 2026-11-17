@@ -1,6 +1,6 @@
 package dotty.tools.sbtplugin
 
-import org.objectweb.asm.*
+import scala.tools.asm.*
 
 import java.io.{BufferedInputStream, File}
 import java.util.jar.JarFile
