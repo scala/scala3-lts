@@ -1068,6 +1068,7 @@ class Definitions {
   @tu lazy val RetainsByNameAnnot: ClassSymbol = requiredClass("scala.annotation.retainsByName")
 
   @tu lazy val JavaRepeatableAnnot: ClassSymbol = requiredClass("java.lang.annotation.Repeatable")
+  @tu lazy val JdkInternalValueBasedAnnot: Symbol = getClassIfDefined("jdk.internal.ValueBased")
 
   // A list of meta-annotations that are relevant for fields and accessors
   @tu lazy val NonBeanMetaAnnots: Set[Symbol] =
