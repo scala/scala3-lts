@@ -10,7 +10,7 @@ import NameKinds.{DefaultGetterName, TailLabelName, TailLocalName, TailTempName}
 import StdNames.nme
 import reporting.*
 import transform.MegaPhase.MiniPhase
-import util.LinearSet
+import scala.collection.immutable
 import dotty.tools.uncheckedNN
 
 import scala.compiletime.uninitialized
@@ -273,7 +273,7 @@ class TailRec extends MiniPhase {
       }
 
     /** Symbols of Labeled blocks that are in tail position. */
-    private var tailPositionLabeledSyms = LinearSet.empty[Symbol]
+    private var tailPositionLabeledSyms = immutable.HashSet.empty[Symbol]
 
     private var inTailPosition = true
 
