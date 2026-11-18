@@ -21,7 +21,7 @@ class MainGenericCompilerTest:
     val directory = Files.createTempDirectory("target-script")
     val initial = CompileSettings(targetScript = "previous.scala")
     try
-      for path <- List(directory.resolve("missing.scala"), directory) do
+      for path <- List(directory.nn.resolve("missing.scala"), directory) do
         val output = new ByteArrayOutputStream
         val settings = Console.withOut(output) {
           initial.withTargetScript(path.toString)
