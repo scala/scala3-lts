@@ -51,6 +51,6 @@ package object tools {
 
   // Ensure this object is already classloaded, since it's only actually used
   // when handling stack overflows and every operation (including class loading)
-  // risks failing.
-  dotty.tools.dotc.core.handleRecursive
+  // risks failing. LTS change: Added getClass to avoid compilation error.
+  dotty.tools.dotc.core.handleRecursive.getClass
  }
