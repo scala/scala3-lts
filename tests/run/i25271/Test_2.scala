@@ -1,3 +1,4 @@
+// test: -jvm 17+
 // scalajs: --skip
 
 // Separate compilation variant of i23479: the sealed Java ancestors are read
