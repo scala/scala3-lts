@@ -4,7 +4,7 @@ import scala.language.unsafeNulls
 
 import scala.annotation.tailrec
 import scala.io.Source
-import scala.util.Try
+import scala.util.{Using, Success, Failure}
 import java.io.File
 import java.lang.Thread
 import scala.annotation.internal.sharable
@@ -65,9 +65,9 @@ case class CompileSettings(
     this.copy(scriptArgs = scriptArgs.appendedAll(args.toList.filter(_.nonEmpty)))
 
   def withTargetScript(file: String): CompileSettings =
-    Try(Source.fromFile(file)).toOption match
-      case Some(_) => this.copy(targetScript = file)
-      case None      =>
+    Using(Source.fromFile(file))(_ => ()) match
+      case Success(_) => this.copy(targetScript = file)
+      case Failure(_) =>
         println(s"not found $file")
         this.copy(exitCode = 2)
   end withTargetScript
