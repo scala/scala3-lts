@@ -1662,7 +1662,7 @@ object Types extends TypeUtils {
     }
 
     /** Dealias, and if result is a dependent function type, drop the `apply` refinement. */
-    final def dropDependentRefinement(using Context): Type = dealias match {
+    final def dropFunctionRefinement(using Context): Type = dealias match {
       case RefinedType(parent, nme.apply, mt) if defn.isNonRefinedFunction(parent) => parent
       case tp => tp
     }
@@ -2023,7 +2023,6 @@ object Types extends TypeUtils {
      */
     def toFunctionType(isJava: Boolean = false, alwaysDependent: Boolean = false)(using Context): Type = this match {
       case mt: MethodType =>
-        assert(!mt.isParamDependent)
         def nonDependentFunType =
           val isContextual = mt.isContextualMethod && !ctx.erasedTypes
           val result1 = mt.nonDependentResultApprox match {
@@ -2034,14 +2033,18 @@ object Types extends TypeUtils {
             mt.paramInfos.mapConserve:
               _.translateFromRepeated(toArray = isJava),
             result1, isContextual)
-        if mt.hasErasedParams then
+        if mt.hasErasedParams || mt.isParamDependent then
+          // Function types with erased parameters are represented with a PolyFunction
+          // parent. We do the same for parameter-dependent method types, since we
+          // don't know how to construct a parametric FunctionN parent for them.
+          // Such method types can only come from explicit `PolyFunction` refinements
+          // or from Tasty files of previous versions; a dependent function type
+          // in source cannot have inter-parameter dependencies.
           defn.PolyFunctionOf(mt)
         else if alwaysDependent || mt.isResultDependent then
           RefinedType(nonDependentFunType, nme.apply, mt)
         else nonDependentFunType
-      case poly @ PolyType(_, mt: MethodType) =>
-        // mt can be paramDependent here since we don't need to compute a
-        // non-dependent result approximation.
+      case poly: PolyType =>
         // TODO: Move all dependent functions to PolyFunctionOf and drop the
         // no parameter dependencies restriction everywhere.
         defn.PolyFunctionOf(poly)
