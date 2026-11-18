@@ -1296,7 +1296,7 @@ object Parsers {
             val d = digits
             if d.isEmpty then
               syntaxError(IllegalLiteral(), start)
-              Literal(Constant.fromValue(null))
+              Literal(Constant(null))
             else
               Number(d, kind)
           token match {
@@ -3885,7 +3885,7 @@ object Parsers {
             accept(EQUALS, help)
             EmptyTree
           else
-            if (!isExprIntro) syntaxError(MissingReturnType(), in.lastOffset)
+            if (!isExprIntro) syntaxErrorOrIncomplete(MissingReturnType(), in.lastOffset)
             accept(EQUALS)
             expr()
 

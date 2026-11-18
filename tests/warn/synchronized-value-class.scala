@@ -1,3 +1,4 @@
+// test: -jvm 17+
 def lit =
   123.synchronized {} // warn
 
