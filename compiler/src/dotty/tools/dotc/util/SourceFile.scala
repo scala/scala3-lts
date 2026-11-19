@@ -11,8 +11,7 @@ import core.Contexts.*
 import scala.io.Codec
 import Chars.*
 import scala.annotation.internal.sharable
-import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.ArrayBuilder
 import dotty.tools.dotc.util.chaining.*
 
 import java.io.File.separator
@@ -123,8 +122,9 @@ class SourceFile(val file: AbstractFile, computeContent: => Array[Char]) extends
 
   private def calculateLineIndicesFromContents() = {
     val cs = content()
-    val buf = new ArrayBuffer[Int]
-    buf += 0
+    val buf = new ArrayBuilder.ofInt // unboxed, unlike ArrayBuffer[Int]
+    buf.sizeHint(cs.length / 30 + 2) // guess a short average line length to avoid regrowing
+    buf.addOne(0)
     var i = 0
     while i < cs.length do
       val isLineBreak =
@@ -132,10 +132,10 @@ class SourceFile(val file: AbstractFile, computeContent: => Array[Char]) extends
         // don't identify the CR in CR LF as a line break, since LF will do.
         if ch == CR then i + 1 == cs.length || cs(i + 1) != LF
         else isLineBreakChar(ch)
-      if isLineBreak then buf += i + 1
+      if isLineBreak then buf.addOne(i + 1)
       i += 1
-    buf += cs.length // sentinel, so that findLine below works smoother
-    buf.toArray
+    buf.addOne(cs.length) // sentinel, so that findLine below works smoother
+    buf.result()
   }
 
   private var lineIndicesCache: Array[Int] = _
