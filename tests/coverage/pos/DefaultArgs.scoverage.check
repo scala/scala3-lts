@@ -77,14 +77,14 @@ Class
 covtest.DefaultArgs
 methodWithDefaults$default$2
 306
-324
+306
 10
 methodWithDefaults$default$2
 DefDef
 false
 0
 false
-0,\n    c: Boolean 
+
 
 4
 DefaultArgs.scala
@@ -111,14 +111,14 @@ Class
 covtest.DefaultArgs
 methodWithDefaults$default$3
 326
-344
+326
 11
 methodWithDefaults$default$3
 DefDef
 false
 0
 false
-true\n  ): String =
+
 
 6
 DefaultArgs.scala
@@ -298,14 +298,14 @@ Object
 covtest.DefaultArgs
 staticMethod$default$1
 639
-651
+639
 24
 staticMethod$default$1
 DefDef
 false
 0
 false
-10, y: Int =
+
 
 17
 DefaultArgs.scala
@@ -332,14 +332,14 @@ Object
 covtest.DefaultArgs
 staticMethod$default$2
 652
-664
+652
 24
 staticMethod$default$2
 DefDef
 false
 0
 false
-20): Int =\n 
+
 
 19
 DefaultArgs.scala
