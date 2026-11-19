@@ -4,9 +4,10 @@ trait Vectoric[V] {
 }
 
 trait VectoricOps {
-  extension [V: Vectoric as v](lhs: V) {
-    def map(f: Double => Double): V = v.map(lhs)(f)
-    def toArray: Array[Double] = v.components.map(c => c(lhs)) // error // error
+  // desugared form of `extension [V: Vectoric as v](lhs: V)` (named context bounds are not available in 3.3)
+  extension [V](lhs: V) {
+    def map(f: Double => Double)(using v: Vectoric[V]): V = v.map(lhs)(f)
+    def toArray(using v: Vectoric[V]): Array[Double] = v.components.map(c => c(lhs)) // error // error
   }
 }
 

@@ -1,15 +1,15 @@
--- [E050] Type Error: tests/neg/i23272b.scala:11:55 --------------------------------------------------------------------
-11 |    def toArray: Array[Double] = v.components.map(c => c(lhs)) // error // error
-   |                                                       ^
-   |                                                       parameter c does not take parameters
+-- [E050] Type Error: tests/neg/i23272b.scala:12:77 --------------------------------------------------------------------
+12 |    def toArray(using v: Vectoric[V]): Array[Double] = v.components.map(c => c(lhs)) // error // error
+   |                                                                             ^
+   |                                                                            parameter c does not take parameters
    |--------------------------------------------------------------------------------------------------------------------
    | Explanation (enabled by `-explain`)
    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    | You have specified more parameter lists than defined in the method definition(s).
     --------------------------------------------------------------------------------------------------------------------
--- [E172] Type Error: tests/neg/i23272b.scala:11:62 --------------------------------------------------------------------
-11 |    def toArray: Array[Double] = v.components.map(c => c(lhs)) // error // error
-   |                                                              ^
+-- [E172] Type Error: tests/neg/i23272b.scala:12:84 --------------------------------------------------------------------
+12 |    def toArray(using v: Vectoric[V]): Array[Double] = v.components.map(c => c(lhs)) // error // error
+   |                                                                                    ^
    |No given instance of type Vectoric[Array[V => Double]] was found for parameter v of method map in trait VectoricOps
    |
    |Note: `v` does not affect whether extension `map` is chosen.
@@ -21,8 +21,8 @@
    | being considered for this method application. Context bounds, when desugared, are appended
    | to the end of the signature even though they are written at the beginning.
     --------------------------------------------------------------------------------------------------------------------
--- [E050] Type Error: tests/neg/i23272b.scala:18:73 --------------------------------------------------------------------
-18 |    def toArray: Array[Double] = summon[Vectoric[V]].components.map(c => c(lhs)) // error // error
+-- [E050] Type Error: tests/neg/i23272b.scala:19:73 --------------------------------------------------------------------
+19 |    def toArray: Array[Double] = summon[Vectoric[V]].components.map(c => c(lhs)) // error // error
    |                                                                         ^
    |                                                                         parameter c does not take parameters
    |--------------------------------------------------------------------------------------------------------------------
@@ -30,8 +30,8 @@
    |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    | You have specified more parameter lists than defined in the method definition(s).
     --------------------------------------------------------------------------------------------------------------------
--- [E172] Type Error: tests/neg/i23272b.scala:18:80 --------------------------------------------------------------------
-18 |    def toArray: Array[Double] = summon[Vectoric[V]].components.map(c => c(lhs)) // error // error
+-- [E172] Type Error: tests/neg/i23272b.scala:19:80 --------------------------------------------------------------------
+19 |    def toArray: Array[Double] = summon[Vectoric[V]].components.map(c => c(lhs)) // error // error
    |                                                                                ^
    |No given instance of type Vectoric[Array[V => Double]] was found for a context parameter of method map in trait AltVectoricOps
    |
