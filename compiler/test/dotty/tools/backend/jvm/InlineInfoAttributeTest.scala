@@ -4,8 +4,8 @@ import dotty.DottyBytecodeTest
 import dotty.tools.backend.jvm.opt.{InlineInfoAttribute, InlineInfoAttributePrototype}
 import org.junit.Assert.*
 import org.junit.Test
-import org.objectweb.asm.{Attribute, ClassReader}
-import org.objectweb.asm.tree.ClassNode
+import scala.tools.asm.{Attribute, ClassReader}
+import scala.tools.asm.tree.ClassNode
 
 import scala.jdk.CollectionConverters.*
 
