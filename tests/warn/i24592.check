@@ -2,3 +2,7 @@
 5 |  transforms.map((str, int) => str) // warn untupled param not local
   |                       ^^^
   |                       unused explicit parameter
+-- [E198] Unused Symbol Warning: tests/warn/i24592.scala:9:23 ----------------------------------------------------------
+9 |  transforms.map((str, _int) => str) // warn LTS doesn't ignore _int
+  |                       ^^^^
+  |                       unused explicit parameter

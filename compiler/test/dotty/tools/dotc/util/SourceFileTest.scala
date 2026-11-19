@@ -85,7 +85,7 @@ class SourceFileTest {
     val text = "abc\n\ndefg\nh"
     val f = source(text)
     val g = source(text)
-    g.setLineIndicesFromLineSizes(text.split("\n", -1).map(_.length))
+    g.setLineIndicesFromLineSizes(text.split("\n", -1).nn.map(_.nn.length))
     for i <- 0 to text.length do
       assertEquals(f.offsetToLine(i), g.offsetToLine(i))
       assertEquals(f.startOfLine(i), g.startOfLine(i))

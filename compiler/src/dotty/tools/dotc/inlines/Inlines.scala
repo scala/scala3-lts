@@ -456,7 +456,7 @@ object Inlines:
 
       constructor.appliedTo(
         lit(error.message),
-        lit(if error.pos.source.textContent().length > 0 then error.pos.lineContent.reverse.dropWhile("\n ".contains).reverse else "<no source available>"),
+        lit(if error.pos.source.length > 0 then error.pos.lineContent.reverse.dropWhile("\n ".contains).reverse else "<no source available>"),
         lit(error.pos.column),
         if kind == ErrorKind.Parser then parserErrorKind else typerErrorKind)
 
