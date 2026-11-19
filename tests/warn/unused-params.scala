@@ -31,7 +31,7 @@ trait BadAPI extends InterFace {
 
   def i24592 =
     val transforms: Seq[(String, Int)] = Nil
-    transforms.map((str, _int) => str) // no warn
+    transforms.map((str, _int) => str) // warn LTS doesn't ignore _int
 
   def meth(x: Int) = x
 
