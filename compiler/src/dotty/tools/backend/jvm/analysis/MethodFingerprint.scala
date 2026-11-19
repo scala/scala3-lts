@@ -2,7 +2,7 @@ package dotty.tools
 package backend.jvm
 package analysis
 
-import org.objectweb.asm.tree.*
+import scala.tools.asm.tree.*
 
 /**
  * Identifies the code of a method at some point, to check that it has not been changed in between two

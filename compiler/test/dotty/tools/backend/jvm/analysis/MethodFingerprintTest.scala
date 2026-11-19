@@ -2,8 +2,8 @@ package dotty.tools.backend.jvm.analysis
 
 import org.junit.Test
 import org.junit.Assert.*
-import org.objectweb.asm.Opcodes.*
-import org.objectweb.asm.tree.*
+import scala.tools.asm.Opcodes.*
+import scala.tools.asm.tree.*
 
 class MethodFingerprintTest {
   // static int f(int x) { L0: if (x == 0) goto L1; return 1; L1: return 0; L2: }, with a try-catch block and a local variable

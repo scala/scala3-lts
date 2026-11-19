@@ -3,6 +3,7 @@ package dotty.tools.backend.jvm
 import dotty.tools.initialize
 import dotty.tools.dotc.core.Symbols.*
 import scala.tools.asm.{Handle, Opcodes}
+import dotty.tools.dotc.core.Contexts.Context
 
 import scala.annotation.constructorOnly
 import scala.collection.mutable

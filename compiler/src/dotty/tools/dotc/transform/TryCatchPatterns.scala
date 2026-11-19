@@ -75,19 +75,18 @@ class TryCatchPatterns extends MiniPhase {
 
   /** Is this pattern node a catch-all or type-test pattern? */
   private def isCatchCase(cdef: CaseDef)(using Context): Boolean = cdef match {
-    case CaseDef(Typed(Ident(nme.WILDCARD), tpt), _, _) =>
+    case CaseDef(Typed(Ident(nme.WILDCARD), tpt), EmptyTree, _) =>
       tpt match {
         case DisjointUnion(types) => types.forall(isSimpleThrowable)
         case _ => isSimpleThrowable(tpt.tpe)
       }
-    case CaseDef(Bind(_, Typed(Ident(nme.WILDCARD), tpt)), _, _) =>
+    case CaseDef(Bind(_, Typed(Ident(nme.WILDCARD), tpt)), EmptyTree, _) =>
       tpt match {
         case DisjointUnion(types) => types.forall(isSimpleThrowable)
         case _ => isSimpleThrowable(tpt.tpe)
       }
     case _ =>
       if isDefaultCase(cdef) then
-        warnForUnreasonableCatch(cdef)
         true
       else
         false
