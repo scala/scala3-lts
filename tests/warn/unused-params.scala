@@ -29,6 +29,10 @@ trait BadAPI extends InterFace {
     a
   }
 
+  def i24592 =
+    val transforms: Seq[(String, Int)] = Nil
+    transforms.map((str, _int) => str) // no warn
+
   def meth(x: Int) = x
 
   override def equals(other: Any): Boolean = true  // no warn

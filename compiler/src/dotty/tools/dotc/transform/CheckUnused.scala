@@ -1,7 +1,7 @@
 package dotty.tools.dotc
 package transform
 
-import dotty.tools.dotc.ast.desugar.{ForArtifact, PatternVar}
+import dotty.tools.dotc.ast.desugar.{ForArtifact, PatternVar, UntupledParam}
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.ast.untpd, untpd.ImportSelector
 import dotty.tools.dotc.config.ScalaSettings
@@ -544,6 +544,7 @@ object CheckUnused:
     val asss = mutable.Set.empty[Symbol]              // targets of assignment
     val skip = mutable.Set.empty[Symbol]              // methods to skip (don't warn about their params)
     val nowarn = mutable.Set.empty[Symbol]            // marked @nowarn
+    val untupled = mutable.Set.empty[Symbol]          // locals that were untupled params
     val calls = new IdentityHashMap[Tree, Unit]          // inlined call already seen
     val imps = new IdentityHashMap[Import, Unit]         // imports
     val sels = new IdentityHashMap[ImportSelector, Unit] // matched selectors
@@ -573,6 +574,8 @@ object CheckUnused:
           && !tree.name.isWildcard
           && !tree.symbol.is(ModuleVal) // track only the ModuleClass using the object symbol, with correct namePos
         then
+          if tree.hasAttachment(UntupledParam) then
+            untupled.addOne(tree.symbol)
           if tree.hasAttachment(NoWarn) then
             nowarn.addOne(tree.symbol)
           val pos =
@@ -931,7 +934,10 @@ object CheckUnused:
       else if sym.is(Param) then // Given | Implicit
         checkImplicit(sym, pos)
       else if sym.isLocalToBlock then
-        checkLocal(sym, pos)
+        if infos.untupled(sym) then
+          checkParam(sym, pos)
+        else
+          checkLocal(sym, pos)
 
     if ctx.settings.WunusedHas.patvars then
       checkPatvars()
