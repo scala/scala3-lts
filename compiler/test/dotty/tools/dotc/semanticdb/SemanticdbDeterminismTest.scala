@@ -33,7 +33,7 @@ class SemanticdbDeterminismTest:
 
   @Test def sameOutputWhenCompiledRepeatedly: Unit =
     val dir = Files.createTempDirectory("semanticdb-determinism-src")
-    val src = Files.writeString(dir.nn.resolve("O.scala"), source).nn
+    val src = Files.write(dir.nn.resolve("O.scala"), source.getBytes(java.nio.charset.StandardCharsets.UTF_8)).nn
     val first = compile(src)
     for i <- 1 to 10 do
       assertArrayEquals(s"compile #${i + 1} differs from the first", first, compile(src))

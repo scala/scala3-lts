@@ -19,11 +19,11 @@ class TastyToolsTest:
 
   /** Compile `source` with `options` and return the output directory. */
   private def compile(name: String, source: String, options: String*): Path =
-    val dir = Path.of(s"out/testTastyTools/$name")
+    val dir = java.nio.file.Paths.get(s"out/testTastyTools/$name")
     Directory(dir.nn).deleteRecursively()
     val classes = Files.createDirectories(dir.nn.resolve("classes"))
     val src = dir.nn.resolve(s"$name.scala")
-    Files.writeString(src, source)
+    Files.write(src, source.getBytes(java.nio.charset.StandardCharsets.UTF_8))
     val flags = TestConfiguration.defaultOptions.and(options*).and("-d", classes.toString, src.toString)
     val reporter = Main.process(flags.all, TestReporter.reporter(System.out.nn, logLevel = ERROR))
     assertFalse(s"Compilation of $name failed.", reporter.hasErrors)
@@ -49,7 +49,7 @@ class TastyToolsTest:
       ++ tastyFiles(classes).map(_.toString)
     val reporter = dotty.tools.dotc.decompiler.Main.process(args, TestReporter.reporter(System.out.nn, logLevel = ERROR))
     assertFalse("Decompilation failed.", reporter.hasErrors)
-    Files.readString(out.nn.resolve("decompiled.scala")).nn
+    new String(Files.readAllBytes(out.nn.resolve("decompiled.scala")), java.nio.charset.StandardCharsets.UTF_8)
 
   private def printTasty(classes: Path): String =
     tastyFiles(classes).map(f => TastyPrinter.showContents(Files.readAllBytes(f).nn, noColor = true)).mkString
