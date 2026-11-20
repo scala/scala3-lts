@@ -77,4 +77,7 @@ class PrintingTest {
 
   @Test
   def inlining: Unit = testIn("tests/printing/inlining", "inlining")
+
+  @Test
+  def tryCatchPatterns: Unit = testIn("tests/printing/tryCatchPatterns", "tryCatchPatterns")
 }
