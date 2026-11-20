@@ -223,33 +223,23 @@ class ClassfileWriters(frontendAccess: PostProcessorFrontendAccess) {
       checkName(filePath.getFileName())
     }
 
-    // the common case is that we are are creating a new file, and on MS Windows the create and truncate is expensive
-    // because there is not an options in the windows API that corresponds to this so the truncate is applied as a separate call
-    // even if the file is new.
-    // as this is rare, its best to always try to create a new file, and it that fails, then open with truncate if that fails
-
-    private val fastOpenOptions = util.EnumSet.of(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
-    private val fallbackOpenOptions = util.EnumSet.of(StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+    private val openOptions = Array(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
 
     override def writeFile(relativePath: String, bytes: Array[Byte]): AbstractFile = {
       val path = base.resolve(relativePath)
       try {
         ensureDirForPath(base, path)
-        val os = if (isWindows) {
-          try FileChannel.open(path, fastOpenOptions)
-          catch {
-            case _: FileAlreadyExistsException => FileChannel.open(path, fallbackOpenOptions)
-          }
-        } else FileChannel.open(path, fallbackOpenOptions)
-
-        try os.write(ByteBuffer.wrap(bytes), 0L)
+        try 
+          // If the path points to a symlink, we want to replace the symlink itself (not its target).
+          // The only way is `deleteIfExists`; `LinkOption.NOFOLLOW_LINKS` instead means "throw if you find a symlink at that path".
+          Files.deleteIfExists(path)
+          Files.write(path, bytes, openOptions*)
         catch {
           case ex: ClosedByInterruptException =>
             try Files.deleteIfExists(path) // don't leave a empty of half-written classfile around after an interrupt
             catch { case _: Throwable => () }
             throw ex
         }
-        os.close()
       } catch {
         case e: FileConflictException =>
           backendReporting.error(em"error writing ${path.toString}: ${e.getMessage}")
