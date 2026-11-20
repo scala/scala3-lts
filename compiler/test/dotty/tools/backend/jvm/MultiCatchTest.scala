@@ -4,8 +4,8 @@ package backend.jvm
 import dotty.DottyBytecodeTest
 import org.junit.Test
 import org.junit.Assert.*
-import org.objectweb.asm.Opcodes.INSTANCEOF
-import org.objectweb.asm.tree.ClassNode
+import scala.tools.asm.Opcodes.INSTANCEOF
+import scala.tools.asm.tree.ClassNode
 
 
 class MultiCatchTest extends DottyBytecodeTest {

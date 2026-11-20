@@ -3,7 +3,7 @@ package backend.jvm
 package analysis
 
 import scala.util.control.ControlThrowable
-import org.objectweb.asm.tree.MethodNode
+import scala.tools.asm.tree.MethodNode
 
 /**
  * Bounds the work done by producer/consumer analyses of a single method.

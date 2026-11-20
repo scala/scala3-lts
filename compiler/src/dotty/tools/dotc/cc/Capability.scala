@@ -57,12 +57,12 @@ object Capabilities:
 
   // Per-capability caches, allocated on first use.
   private final class CapabilityCaches:
-    private var myCaptureSet: CaptureSet | Null = uninitialized
-    private var captureSetValid: Validity = invalid
-    private var mySingletonCaptureSet: CaptureSet.Const | Null = null
-    private var myDerived: List[DerivedCapability] = Nil
-    private var myClassifiers: Classifiers = UnknownClassifier
-    private var classifiersValid: Validity = invalid
+    var myCaptureSet: CaptureSet | Null = uninitialized
+    var captureSetValid: Validity = invalid
+    var mySingletonCaptureSet: CaptureSet.Const | Null = null
+    var myDerived: List[DerivedCapability] = Nil
+    var myClassifiers: Classifiers = UnknownClassifier
+    var classifiersValid: Validity = invalid
     // Recursion brake for `captureSetOfInfo`
     var computingInfo: Boolean = false
 
@@ -645,7 +645,7 @@ object Capabilities:
 
     /** The capture set consisting of exactly this reference */
     def singletonCaptureSet(using Context): CaptureSet.Const =
-      if mySingletonCaptureSet == null then
+      if caches.mySingletonCaptureSet == null then
         caches.mySingletonCaptureSet = CaptureSet(this)
       caches.mySingletonCaptureSet.uncheckedNN
 

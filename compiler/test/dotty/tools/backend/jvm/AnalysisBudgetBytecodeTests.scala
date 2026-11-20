@@ -44,8 +44,8 @@ class AnalysisBudgetExhaustedTests extends AnalysisBudgetBytecodeTest {
 }
 
 class AnalysisBudgetInvariantTests {
-  import org.objectweb.asm.Opcodes.*
-  import org.objectweb.asm.tree.{InsnNode, MethodNode}
+  import scala.tools.asm.Opcodes.*
+  import scala.tools.asm.tree.{InsnNode, MethodNode}
   import dotty.tools.backend.jvm.analysis.AnalysisBudget
 
   def method(): MethodNode = {
