@@ -1010,13 +1010,17 @@ object SpaceEngine {
   }
 
   def checkMatch(m: Match)(using Context): Unit =
-    inContext(ctx.withProperty(IsSubspaceCacheKey, Some(mutable.HashMap.empty))) {
+    // `maximizeType` adds pattern-bound symbols to the GADT state of its context:
+    // keep them local to this match rather than the phase (and run) context.
+    inContext(ctx.fresh.setFreshGADTBounds.setProperty(IsSubspaceCacheKey, mutable.HashMap.empty)) {
       checkMatchExhaustivityOnly(m)
       if reachabilityCheckable(m.selector) then checkReachability(m)
     }
 
   def checkMatchExhaustivityOnly(m: Match)(using Context): Unit =
-    inContext(ctx.withProperty(IsSubspaceCacheKey, Some(mutable.HashMap.empty))) {
+    // `maximizeType` adds pattern-bound symbols to the GADT state of its context:
+    // keep them local to this match rather than the phase (and run) context.
+    inContext(ctx.fresh.setFreshGADTBounds.setProperty(IsSubspaceCacheKey, mutable.HashMap.empty)) {
       if exhaustivityCheckable(m.selector) then 
         inContext(ctx.withProperty(ExpandingCaseClassesKey, Some(mutable.Set.empty))) {
           checkExhaustivity(m)
