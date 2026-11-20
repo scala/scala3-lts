@@ -23,7 +23,7 @@ import scala.annotation.tailrec
 private class QuoteDriver(appClassloader: ClassLoader) extends Driver:
   import tpd._
 
-  private[this] val contextBase: ContextBase = new ContextBase
+  private[this] var contextBase: ContextBase = new ContextBase
 
   /** Shared by all runs, so that each run gets a new run id and the run-dependent caches
    *  of `contextBase` (e.g. base type caches) do not keep the trees of past runs (#12543).

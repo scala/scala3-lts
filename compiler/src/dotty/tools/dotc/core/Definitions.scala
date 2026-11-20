@@ -1067,6 +1067,7 @@ class Definitions {
   @tu lazy val RetainsAnnot: ClassSymbol = requiredClass("scala.annotation.retains")
   @tu lazy val RetainsByNameAnnot: ClassSymbol = requiredClass("scala.annotation.retainsByName")
 
+  @tu lazy val JavaAnnotationClass: ClassSymbol = requiredClass("java.lang.annotation.Annotation")
   @tu lazy val JavaRepeatableAnnot: ClassSymbol = requiredClass("java.lang.annotation.Repeatable")
   // JEP 390. Under `-release`, ct.sym lacks the class and its classfiles refer to `jdk.internal.ValueBased+Annotation`
   // instead. Like javac, use a synthetic symbol in that case.

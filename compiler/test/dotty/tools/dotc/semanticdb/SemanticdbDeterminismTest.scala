@@ -29,11 +29,11 @@ class SemanticdbDeterminismTest:
       "-Xsemanticdb", "-sourceroot", src.getParent.toString, "-semanticdb-target", out.toString,
       "-d", out.toString, "-classpath", TestConfiguration.basicClasspath, src.toString))
     assertFalse("compilation failed", reporter.hasErrors)
-    Files.readAllBytes(out.resolve("META-INF/semanticdb/O.scala.semanticdb"))
+    Files.readAllBytes(out.nn.resolve("META-INF/semanticdb/O.scala.semanticdb")).nn
 
   @Test def sameOutputWhenCompiledRepeatedly: Unit =
     val dir = Files.createTempDirectory("semanticdb-determinism-src")
-    val src = Files.writeString(dir.resolve("O.scala"), source)
+    val src = Files.writeString(dir.nn.resolve("O.scala"), source).nn
     val first = compile(src)
     for i <- 1 to 10 do
       assertArrayEquals(s"compile #${i + 1} differs from the first", first, compile(src))

@@ -60,9 +60,9 @@ class MultiRunRetentionTest:
 
   @Test def noStateFromEarlierRuns(): Unit =
     val dir = Files.createTempDirectory("multi-run-retention")
-    val out = Files.createDirectories(dir.resolve("out"))
+    val out = Files.createDirectories(dir.nn.resolve("out"))
     val files = for (name, content) <- sources yield
-      Files.writeString(dir.resolve(name), content).toString
+      Files.writeString(dir.nn.resolve(name), content).toString
 
     object driver extends Driver:
       var lastRun: Run | Null = null
