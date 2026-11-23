@@ -247,6 +247,9 @@ final class CodeGen(ownerPhase: Phase, gen: BCode, localOpt: Option[LocalOptimiz
     addInnerClasses(declared, referred)
     // Finally, convert the class node to bytes
     val writer = new ClassWriterWithBTypeLub(gen.classBTypeCache())
+    // Lift all ASM-imposed limits, trust the frontend, otherwise some valid code cannot ebe compiled
+    // (e.g., in `tests/pos/t10387b.scala` and `tests/pos/big-code.scala`)
+    writer.setComputeLimits(Int.MaxValue, Long.MaxValue)
     classNode.accept(writer)
     writer.toByteArray
   }
