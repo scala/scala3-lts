@@ -207,6 +207,7 @@ class CompletionMatchSuite extends BaseCompletionSuite:
     )
 
   @Test def `exhaustive-java-sealed` =
+    org.junit.Assume.assumeTrue(scala.util.Properties.isJavaAtLeast("17"))
     check(
       """
         |package example
@@ -222,6 +223,7 @@ class CompletionMatchSuite extends BaseCompletionSuite:
     )
 
   @Test def `exhaustive-java-sealed-edit` =
+    org.junit.Assume.assumeTrue(scala.util.Properties.isJavaAtLeast("17"))
     checkEdit(
       """
         |package example
