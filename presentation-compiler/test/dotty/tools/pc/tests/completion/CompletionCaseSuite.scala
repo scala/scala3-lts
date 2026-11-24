@@ -465,6 +465,7 @@ class CompletionCaseSuite extends BaseCompletionSuite:
     )
 
   @Test def `java-sealed` =
+    org.junit.Assume.assumeTrue(scala.util.Properties.isJavaAtLeast("17"))
     check(
       """
         |package example

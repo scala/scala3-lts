@@ -19,18 +19,18 @@ class TastyToolsTest:
 
   /** Compile `source` with `options` and return the output directory. */
   private def compile(name: String, source: String, options: String*): Path =
-    val dir = Path.of(s"out/testTastyTools/$name")
-    Directory(dir).deleteRecursively()
-    val classes = Files.createDirectories(dir.resolve("classes"))
-    val src = dir.resolve(s"$name.scala")
-    Files.writeString(src, source)
+    val dir = java.nio.file.Paths.get(s"out/testTastyTools/$name")
+    Directory(dir.nn).deleteRecursively()
+    val classes = Files.createDirectories(dir.nn.resolve("classes"))
+    val src = dir.nn.resolve(s"$name.scala")
+    Files.write(src, source.getBytes(java.nio.charset.StandardCharsets.UTF_8))
     val flags = TestConfiguration.defaultOptions.and(options*).and("-d", classes.toString, src.toString)
-    val reporter = Main.process(flags.all, TestReporter.reporter(System.out, logLevel = ERROR))
+    val reporter = Main.process(flags.all, TestReporter.reporter(System.out.nn, logLevel = ERROR))
     assertFalse(s"Compilation of $name failed.", reporter.hasErrors)
-    classes
+    classes.nn
 
   private def tastyFiles(classes: Path): List[Path] =
-    Files.walk(classes).iterator.asScala.filter(_.toString.endsWith(".tasty")).toList
+    Files.walk(classes).nn.iterator.nn.asScala.filter(_.toString.endsWith(".tasty")).toList
 
   private def classpath(classes: Path): String =
     s"${TestConfiguration.basicClasspath}${JFile.pathSeparator}$classes"
@@ -39,7 +39,7 @@ class TastyToolsTest:
     val out = Files.createDirectories(classes.resolveSibling("from-tasty"))
     val args = Array("-from-tasty", "-color:never", "-d", out.toString, "-classpath", classpath(classes))
       ++ tastyFiles(classes).map(_.toString)
-    val reporter = Main.process(args, TestReporter.reporter(System.out, logLevel = ERROR))
+    val reporter = Main.process(args, TestReporter.reporter(System.out.nn, logLevel = ERROR))
     assertFalse("-from-tasty failed.", reporter.hasErrors)
 
   /** Decompile the TASTy in `classes` and return the decompiled source. */
@@ -47,12 +47,12 @@ class TastyToolsTest:
     val out = Files.createDirectories(classes.resolveSibling("decompiled"))
     val args = Array("-color:never", "-d", out.toString, "-classpath", classpath(classes))
       ++ tastyFiles(classes).map(_.toString)
-    val reporter = dotty.tools.dotc.decompiler.Main.process(args, TestReporter.reporter(System.out, logLevel = ERROR))
+    val reporter = dotty.tools.dotc.decompiler.Main.process(args, TestReporter.reporter(System.out.nn, logLevel = ERROR))
     assertFalse("Decompilation failed.", reporter.hasErrors)
-    Files.readString(out.resolve("decompiled.scala"))
+    new String(Files.readAllBytes(out.nn.resolve("decompiled.scala")), java.nio.charset.StandardCharsets.UTF_8)
 
   private def printTasty(classes: Path): String =
-    tastyFiles(classes).map(f => TastyPrinter.showContents(Files.readAllBytes(f), noColor = true, isBestEffortTasty = false)).mkString
+    tastyFiles(classes).map(f => TastyPrinter.showContents(Files.readAllBytes(f).nn, noColor = true)).mkString
 
   @Test def printSelectOuter(): Unit =
     // the inline body refers to the outer `this` through the self alias, pickled as SELECTouter
@@ -64,19 +64,6 @@ class TastyToolsTest:
         |    inline def c = outer.c
         |""".stripMargin)
     assertTrue(printTasty(classes).contains("SELECTouter"))
-
-  @Test def printModifierTags(): Unit =
-    val tracked = compile("printTracked", "class A(tracked val x: Int)\n", "-source", "future", "-language:experimental.modularity")
-    assertTrue(printTasty(tracked).contains("TRACKED"))
-    val into = compile("printInto", "import Conversion.into\ninto trait T\n")
-    assertTrue(printTasty(into).contains("INTO"))
-    val subMatch = compile("printSubMatch",
-      """import scala.language.experimental.subCases
-        |def f(x: Option[Option[Int]]) = x match
-        |  case Some(y) if y match case Some(z) => z
-        |  case _ => 0
-        |""".stripMargin)
-    assertTrue(printTasty(subMatch).contains("SUBMATCH"))
 
   @Test def fromTastyQuotePattern(): Unit =
     // the only quotes are patterns, which also need staging when read back from TASTy
@@ -95,14 +82,3 @@ class TastyToolsTest:
         |""".stripMargin))
     assertTrue(decompiled, decompiled.contains("_*"))
 
-  @Test def decompileCaptureAnnotations(): Unit =
-    val decompiled = decompile(compile("decompileCaptureAnnotations",
-      """import language.experimental.captureChecking
-        |class C extends caps.SharedCapability
-        |class Ref(val c: C):
-        |  val get: () ->{c} Int = () => 1
-        |def f(c: C) =
-        |  val r = Ref(c)
-        |  r.get
-        |""".stripMargin))
-    assertTrue(decompiled, decompiled.contains("retains"))

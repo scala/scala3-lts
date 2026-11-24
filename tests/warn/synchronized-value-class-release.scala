@@ -1,3 +1,4 @@
+// test: -jvm 17+
 //> using options -release 17
 
 // ct.sym refers to `jdk.internal.ValueBased` under a different name

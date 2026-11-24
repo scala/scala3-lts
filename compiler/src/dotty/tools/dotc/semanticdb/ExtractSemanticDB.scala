@@ -25,7 +25,7 @@ import scala.jdk.CollectionConverters.*
 import scala.PartialFunction.condOpt
 import typer.ImportInfo.withRootImports
 import dotty.tools.dotc.semanticdb as s
-import dotty.tools.io.AbstractFile
+import dotty.tools.io.{AbstractFile, JarArchive}
 import dotty.tools.dotc.semanticdb.DiagnosticOps.*
 
 import scala.util.{Failure, Success, Using}
