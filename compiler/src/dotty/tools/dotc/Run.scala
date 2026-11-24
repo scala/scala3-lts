@@ -36,6 +36,8 @@ import scala.util.control.NonFatal
 import scala.io.Codec
 
 import Run.Progress
+import Comments.docCtx
+import inlines.Inlines.InlineTraitState
 import scala.compiletime.uninitialized
 import dotty.tools.dotc.transform.MegaPhase
 import dotty.tools.dotc.util.chaining.*
@@ -393,6 +395,7 @@ class Run(comp: Compiler, ictx: Context) extends ImplicitRunInfo with Constraint
       val action = finalizeActions.remove(0)
       action()
     }
+    ctx.docCtx.foreach(_.removeStale())
     compiling = false
   }
 
@@ -510,6 +513,10 @@ class Run(comp: Compiler, ictx: Context) extends ImplicitRunInfo with Constraint
       .setTyper(new Typer)
       .addMode(Mode.ImplicitsEnabled)
       .setTyperState(ctx.typerState.fresh(ctx.reporter))
+      // GADT constraints and inline trait origins recorded while compiling must not
+      // end up in the root context, which may be shared with later runs.
+      .setFreshGADTBounds
+      .setInlineTraitState(InlineTraitState())
     if ctx.settings.YexplicitNulls.value && !Feature.enabledBySetting(nme.unsafeNulls) then
       start = start.addMode(Mode.SafeNulls)
     ctx.initialize()(using start) // re-initialize the base context with start
