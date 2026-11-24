@@ -277,7 +277,7 @@ final class ClassfileParser(
   private var pool: ConstantPool = uninitialized        // the classfile's constant pool
 
   private var currentClassName: SimpleName = uninitialized // JVM name of the current class
-  private var classTParams: Map[Name, Symbol] = Map()
+  private var classTParams: Map[Name, Symbol] = Map.empty
 
   private val Scala2UnpicklingMode = Mode.Scala2Unpickling
   private var classfileVersion: Header.Version = Header.Version.Unknown

@@ -101,7 +101,7 @@ class ImportInfo(symf: Context ?=> Symbol,
 
   /** Compute info relating to the selector list */
   private def ensureInitialized(): Unit = if myExcluded == null then
-    myExcluded = Set()
+    myExcluded = Set.empty
     myForwardMapping = SimpleIdentityMap.empty
     myReverseMapping = SimpleIdentityMap.empty
     for sel <- selectors do
@@ -214,17 +214,18 @@ class ImportInfo(symf: Context ?=> Symbol,
    *  means that preceding imports are not considered and the feature is not imported.
    */
   def featureImported(feature: TermName)(using Context): Boolean =
-    if !featureCache.contains(feature) then
-      featureCache = featureCache.updated(feature,
-        mentionsFeature(feature) match
+    featureCache(feature) match
+      case null =>
+        val result = mentionsFeature(feature) match
           case Some(bv) => bv
           case None =>
             var c = ctx.outer
             while c.importInfo eq ctx.importInfo do c = c.outer
             val cinfo = c.importInfo
             (cinfo != null) && cinfo.featureImported(feature)(using c)
-      )
-    featureCache(feature).nn
+        featureCache = featureCache.updated(feature, result)
+        result
+      case v => v
 
   def toText(printer: Printer): Text = printer.toText(this)
 }
