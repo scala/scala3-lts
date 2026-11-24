@@ -23,7 +23,7 @@ class ScriptEngine extends AbstractScriptEngine {
       "-usejavacp",
       "-color:never",
       "-Xrepl-disable-display",
-      "-Xrepl-interrupt-instrumentation",
+      "-Xrepl-interrupt-instrumentation:false",
       "false"
     ))
 
