@@ -23,8 +23,7 @@ class ScriptEngine extends AbstractScriptEngine {
       "-usejavacp",
       "-color:never",
       "-Xrepl-disable-display",
-      "-Xrepl-interrupt-instrumentation:false",
-      "false"
+      "-Xrepl-interrupt-instrumentation:false"
     ))
 
   private val rendering = new Rendering(Some(getClass.getClassLoader))
