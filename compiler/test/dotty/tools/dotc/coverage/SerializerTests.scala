@@ -41,7 +41,7 @@ class SerializerTests {
         fullClassName = "my\npackage\\ with a weird\fname.My\rClass",
         classType = "Class",
         methodName = "meth\tod",
-        sourcePath = sourceRoot.resolve("/tmp/\nsomewhere\\.scala").nn
+        sourcePath = sourceRoot.resolve("tmp").nn.resolve("some where\\.scala").nn
       ),
       id = 123,
       start = 456,
