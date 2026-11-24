@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'sbt'
       - uses: sbt/setup-sbt@67d461eba2c4753196c230e02da850757ba4775e # v1.5.14
       - name: Build and test launcher command
@@ -37,7 +37,7 @@ jobs:
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'sbt'
       - uses: sbt/setup-sbt@67d461eba2c4753196c230e02da850757ba4775e # v1.5.14
       - name: Build and test launcher command
@@ -56,7 +56,7 @@ jobs:
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'sbt'
       - uses: sbt/setup-sbt@67d461eba2c4753196c230e02da850757ba4775e # v1.5.14
       - name: Build and test launcher command
@@ -75,7 +75,7 @@ jobs:
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'sbt'
       - uses: sbt/setup-sbt@67d461eba2c4753196c230e02da850757ba4775e # v1.5.14
       - name: Build and test launcher command
@@ -94,7 +94,7 @@ jobs:
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'sbt'
       - uses: sbt/setup-sbt@67d461eba2c4753196c230e02da850757ba4775e # v1.5.14
       - name: Build the launcher command
