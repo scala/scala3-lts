@@ -584,7 +584,7 @@ object Build {
           val enableCoveragePhase = args.contains("--enable-coverage-phase")
           val args1 = if (updateCheckfile | fromTasty | rerunFailed | enableCoveragePhase) args.filter(x => x != "--update-checkfiles" && x != "--from-tasty" && x != "--failed" && x != "--enable-coverage-phase") else args
           val test = if (fromTasty) "dotty.tools.dotc.FromTastyTests" else "dotty.tools.dotc.*CompilationTests dotty.tools.dotc.coverage.*"
-          val cmd = s" $test -- --exclude-categories=dotty.SlowTests" +
+          val cmd = s" $test -- -Ddotty.tests.quick=TRUE " +
             (if (updateCheckfile) " -Ddotty.tests.updateCheckfiles=TRUE" else "") +
             (if (rerunFailed) " -Ddotty.tests.rerunFailed=TRUE" else "") +
             (if (enableCoveragePhase) " -Ddotty.tests.instrumentCoverage=TRUE" else "") +
@@ -715,7 +715,7 @@ object Build {
                |usage: testCompilation [--help] [--from-tasty] [--update-checkfiles] [--failed] [--enable-coverage-phase] [<filter>]
                |
                |By default runs tests in dotty.tools.dotc.*CompilationTests and dotty.tools.dotc.coverage.*,
-               |excluding tests tagged with dotty.SlowTests.
+               |excluding "slow" tests.
                |
                |  --help                show this message
                |  --from-tasty          runs tests in dotty.tools.dotc.FromTastyTests
@@ -736,7 +736,7 @@ object Build {
           val enableCoveragePhase = args.contains("--enable-coverage-phase")
           val args1 = if (updateCheckfile | fromTasty | rerunFailed | coverage | enableCoveragePhase) args.filter(x => x != "--update-checkfiles" && x != "--from-tasty" && x != "--failed" && x != "--coverage" && x != "--enable-coverage-phase") else args
           val test = if (fromTasty) "dotty.tools.dotc.FromTastyTests" else if (coverage) "dotty.tools.dotc.coverage.*" else "dotty.tools.dotc.*CompilationTests"
-          val cmd = s" $test -- --exclude-categories=dotty.SlowTests" +
+          val cmd = s" $test -- -Ddotty.tests.quick=TRUE " +
             (if (updateCheckfile) " -Ddotty.tests.updateCheckfiles=TRUE" else "") +
             (if (rerunFailed) " -Ddotty.tests.rerunFailed=TRUE" else "") +
             (if (enableCoveragePhase) " -Ddotty.tests.instrumentCoverage=TRUE" else "") +
