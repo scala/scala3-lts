@@ -390,8 +390,6 @@ object Build {
       // Reflect doesn't expect to see it as a standalone definition
       // and therefore it's easier just not to document it
       "-skip-by-id:scala.runtime.MatchCase",
-      "-skip-by-id:dotty.tools.tasty",
-      "-skip-by-id:dotty.tools.tasty.util",
       "-project-footer", s"Copyright (c) 2002-$currentYear, LAMP/EPFL",
       "-author",
       "-groups",
@@ -494,7 +492,10 @@ object Build {
       assert(docScalaInstance.loaderCompilerOnly == base.loaderCompilerOnly)
       docScalaInstance
     },
-    Compile / doc / scalacOptions ++= scalacOptionsDocSettings()
+    Compile / doc / scalacOptions ++= scalacOptionsDocSettings(),
+    // `-siteroot` defaults to `./docs`, which sbt resolves against the repo root, so without
+    // this every javadoc JAR would bundle the repo's static site (blog, reference, PDFs).
+    Compile / doc / scalacOptions ++= Seq("-siteroot", (baseDirectory.value / "docs").getPath),
   )
 
   lazy val commonBenchmarkSettings = Seq(
