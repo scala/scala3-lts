@@ -28,7 +28,7 @@ class ExtraTypeParametersSpecification:
     assertNotEquals(original, changed)
 
   private def hash(method: String): Int =
-    val source = s"package repro\n$method"
+    val source = s"package repro\nimport scala.language.experimental.clauseInterleaving\n$method"
     val apis = new ScalaCompilerForUnitTesting().extractApiFromSrc(source)
     val definition = apis.iterator.flatMap(_.structure().declared()).collectFirst:
       case method: Def if method.name() == "choose" => method
