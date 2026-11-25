@@ -317,7 +317,7 @@ object ProtoTypes {
 
   /** A prototype for expressions that appear in function position
    *
-   *  [](args): resultType
+   *  `[](args): resultType`
    *
    *  @param  args      The untyped arguments to which the function is applied
    *  @param  resType   The expeected result type
@@ -579,7 +579,7 @@ object ProtoTypes {
 
   /** A prototype for expressions that appear in function position
    *
-   *  [](args): resultType, where args are known to be typed
+   *  `[](args): resultType`, where args are known to be typed
    */
   class FunProtoTyped(args: List[tpd.Tree], resultType: Type)(typer: Typer, applyKind: ApplyKind)(using Context)
   extends FunProto(args, resultType)(typer, applyKind):

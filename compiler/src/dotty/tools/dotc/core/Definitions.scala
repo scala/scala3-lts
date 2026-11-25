@@ -339,6 +339,7 @@ class Definitions {
    *
    *  1. At the top level:
    *
+   *       ```
    *       // A.java
    *       void meth1(Object arg) {}
    *       <T> void meth2(T arg) {} // T implicitly extends Object
@@ -346,12 +347,14 @@ class Definitions {
    *       // B.scala
    *       meth1(1) // OK
    *       meth2(1) // OK
+   *       ```
    *
    *     This is safe even though Int is not a subtype of Object, because Erasure
    *     will detect the mismatch and box the value type.
    *
    *  2. In a class type parameter:
    *
+   *       ```
    *       // A.java
    *       void meth3(scala.List<Object> arg) {}
    *       <T> void meth4(scala.List<T> arg) {}
@@ -359,11 +362,13 @@ class Definitions {
    *       // B.scala
    *       meth3(List[Int](1)) // OK
    *       meth4(List[Int](1)) // OK
+   *       ```
    *
    *     At erasure, type parameters are removed and value types are boxed.
    *
    *  3. As the type parameter of an array:
    *
+   *       ```
    *       // A.java
    *       void meth5(Object[] arg) {}
    *       <T> void meth6(T[] arg) {}
@@ -371,6 +376,7 @@ class Definitions {
    *       // B.scala
    *       meth5(Array[Int](1)) // error: Array[Int] is not a subtype of Array[Object]
    *       meth6(Array[Int](1)) // error: Array[Int] is not a subtype of Array[T & Object]
+   *       ```
    *
    *
    *     This is a bit more subtle: at erasure, Arrays keep their type parameter,
@@ -384,6 +390,7 @@ class Definitions {
    *
    *  4. As the repeated argument of a varargs method:
    *
+   *       ```
    *       // A.java
    *       void meth7(Object... args) {}
    *       <T> void meth8(T... args) {}
@@ -393,7 +400,8 @@ class Definitions {
    *       meth8(1) // OK (creates a primitive array and copies it into a reference array at Erasure)
    *       val ai = Array[Int](1)
    *       meth7(ai: _*) // OK (will copy the array at Erasure)
-   *       meth8(ai: _*) // OK (will copy the array at Erasure)
+   *       meth8(ai*) // OK (will copy the array at Erasure)
+   *       ```
    *
    *     Java repeated arguments are erased to arrays, so it would be safe to treat
    *     them in the same way: add an `& Object` to the parameter type to disallow
