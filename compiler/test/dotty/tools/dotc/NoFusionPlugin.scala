@@ -16,6 +16,6 @@ object NoFusionPlugin:
   // `-Xplugin` for a directory holding just `plugin.properties`; the class loads from the test classpath.
   lazy val option: String =
     val dir = java.nio.file.Files.createTempDirectory("noFusionPlugin").nn
-    java.nio.file.Files.writeString(dir.resolve("plugin.properties"), s"pluginClass=${classOf[NoFusionPlugin].getName}\n")
+    java.nio.file.Files.write(dir.resolve("plugin.properties"), s"pluginClass=${classOf[NoFusionPlugin].getName}\n".getBytes())
     dir.toFile.nn.deleteOnExit()
     s"-Xplugin:$dir"
