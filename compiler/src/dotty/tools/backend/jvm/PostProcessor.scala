@@ -95,6 +95,9 @@ class PostProcessor(val frontendAccess: PostProcessorFrontendAccess, val bTypes:
 
   def serializeClass(classNode: ClassNode): Array[Byte] = {
     val cw = new ClassWriterWithBTypeLub(backendUtils.extraProc)
+    // Lift all ASM-imposed limits, trust the frontend, otherwise some valid code cannot be compiled
+    // (e.g., in `tests/pos/t10387b.scala` and `tests/pos/big-code.scala`)
+    cw.setComputeLimits(Int.MaxValue, Long.MaxValue)
     classNode.accept(cw)
     cw.toByteArray.nn
   }

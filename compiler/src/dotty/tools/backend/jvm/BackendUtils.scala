@@ -189,5 +189,7 @@ object BackendUtils {
     24 -> asm.Opcodes.V24,
     25 -> asm.Opcodes.V25,
     26 -> asm.Opcodes.V26,
+    27 -> asm.Opcodes.V27,
+    28 -> asm.Opcodes.V28,
   )
 }
