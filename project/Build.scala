@@ -1250,7 +1250,7 @@ object Build {
     val mtagsVersion = "1.6.9"
     Seq(
       libraryDependencies ++= Seq(
-        "at.yawk.lz4" % "lz4-java" % "1.12.0",
+        "at.yawk.lz4" % "lz4-java" % "1.12.1",
         "io.get-coursier" % "interface" % "1.0.30",
         ("org.scalameta" % "mtags-interfaces" % mtagsVersion)
           .exclude("org.eclipse.lsp4j","org.eclipse.lsp4j")
