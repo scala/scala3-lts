@@ -176,7 +176,7 @@ class CommitBisectScriptTest extends munit.FunSuite:
     val dir = java.nio.file.Files.createTempDirectory("bisect-test-")
     try
       java.nio.file.Files.createDirectories(dir.resolve("project"))
-      java.nio.file.Files.writeString(dir.resolve("project/Build.scala"), buildScala)
+      java.nio.file.Files.write(dir.resolve("project/Build.scala"), buildScala.getBytes())
       val selection = CommitBisectScripts.selectSbtProjectsScript(bootstrapped)
       val command = s"""$selection\necho "$$scala3CompilerProject|$$publishRecipe""""
       scala.sys.process.Process(Seq("sh", "-c", command), dir.toFile).!!.trim
