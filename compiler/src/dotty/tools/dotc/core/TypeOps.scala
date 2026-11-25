@@ -581,14 +581,20 @@ object TypeOps:
           case _ => false
         }
 
+      private var pendingTypeVars: List[TypeVar] = Nil
+
       override def apply(tp: Type): Type = tp match
         case tp: TypeVar if mapCtx.typerState.constraint.contains(tp) =>
-          val lo = TypeComparer.instanceType(
-            tp.origin,
-            fromBelow = variance > 0 || variance == 0 && tp.hasLowerBound,
-            widenUnions = tp.widenUnions)(using mapCtx)
-          val lo1 = apply(lo)
-          if (lo1 ne lo) lo1 else tp
+          if pendingTypeVars.exists(_ eq tp) then tp
+          else
+            pendingTypeVars = tp :: pendingTypeVars
+            val lo = TypeComparer.instanceType(
+              tp.origin,
+              fromBelow = variance > 0 || variance == 0 && tp.hasLowerBound,
+              widenUnions = tp.widenUnions)(using mapCtx)
+            val lo1 = apply(lo)
+            pendingTypeVars = pendingTypeVars.tail
+            if (lo1 ne lo) lo1 else tp
         case _ =>
           super.apply(tp)
       end apply
