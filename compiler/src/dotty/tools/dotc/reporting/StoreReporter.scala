@@ -33,14 +33,14 @@ class StoreReporter(outer: Reporter | Null = Reporter.NoReporter, fromTyperState
   override def hasStickyErrors: Boolean =
     infos != null && infos.uncheckedNN.exists(_.isInstanceOf[StickyError])
 
-  override def removeBufferedMessages(using Context): List[Diagnostic] =
+  override def removeBufferedMessages: List[Diagnostic] =
     if (infos != null) try infos.uncheckedNN.toList finally infos = null
     else Nil
 
-  override def mapBufferedMessages(f: Diagnostic => Diagnostic)(using Context): Unit =
+  override def mapBufferedMessages(f: Diagnostic => Diagnostic): Unit =
     if infos != null then infos.uncheckedNN.mapInPlace(f)
 
-  override def pendingMessages(using Context): List[Diagnostic] =
+  override def pendingMessages: List[Diagnostic] =
     if (infos != null) infos.uncheckedNN.toList else Nil
 
   override def errorsReported: Boolean = hasErrors || (outer != null && outer.errorsReported)

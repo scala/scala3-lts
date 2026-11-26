@@ -1456,7 +1456,7 @@ object desugar {
 
   /**     val p1, ..., pN: T = E
    *  ==>
-   *      makePatDef[[val p1: T1 = E]]; ...; makePatDef[[val pN: TN = E]]
+   *      makePatDef(val p1: T1 = E); ...; makePatDef(val pN: TN = E)
    *
    *      case e1, ..., eN
    *  ==>
