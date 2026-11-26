@@ -1,3 +1,4 @@
+// test: -jvm 17+
 package repro;
 
 public sealed interface Event<T> permits Event.Item, Event.TimedOut, Event.Failed {
