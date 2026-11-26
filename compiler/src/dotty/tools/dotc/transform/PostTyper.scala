@@ -374,6 +374,7 @@ class PostTyper extends MacroTransform with IdentityDenotTransformer { thisPhase
           if tree.symbol == defn.QuotedTypeModule_of then
             ctx.compilationUnit.needsStaging = true
           registerNeedsInlining(tree)
+          CrossVersionChecks.checkSignaturePolymorphicCast(tree)
           val tree1 @ TypeApply(fn, args) = normalizeTypeArgs(tree)
           for arg <- args do
             checkInferredWellFormed(arg)
