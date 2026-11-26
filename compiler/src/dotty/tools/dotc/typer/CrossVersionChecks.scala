@@ -167,14 +167,14 @@ object CrossVersionChecks:
   def checkSignaturePolymorphicCast(tree: tpd.TypeApply)(using Context): Unit = tree match
     case tpd.TypeApply(tpd.Select(app @ tpd.Apply(fn, _), nme.asInstanceOf_), targ :: Nil) =>
       val sigPoly = fn.symbol.originalSignaturePolymorphic
-      if sigPoly.exists && sigPoly.info.resultType.stripNull().isRef(defn.ObjectClass) then
+      if sigPoly.exists && sigPoly.info.resultType.stripNull.isRef(defn.ObjectClass) then
         def erasesToObject(tp: Type) = TypeErasure.erasure(tp).isRef(defn.ObjectClass)
         val name = sigPoly.symbol.name
         val resTp = app.tpe.widen
         if !erasesToObject(resTp) then
           report.deprecationWarning(
             em"""using the cast to set the result type of signature polymorphic method $name is deprecated;
-                |use a type ascription instead: `(... : ${resTp.stripNull()})`""",
+                |use a type ascription instead: `(... : ${resTp.stripNull})`""",
             app.srcPos)
         else if !erasesToObject(targ.tpe) then
           report.warning(
