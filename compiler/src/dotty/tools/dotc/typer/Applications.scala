@@ -22,7 +22,7 @@ import ProtoTypes.*
 import Inferencing.*
 import reporting.*
 import Nullables.*, NullOpsDecorator.*
-import config.Feature
+import config.{Feature, SourceVersion}
 
 import collection.mutable
 import config.Printers.{overload, typr, unapp}

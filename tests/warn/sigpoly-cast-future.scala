@@ -1,3 +1,4 @@
+// test: -jvm 9+
 //> using options -source future
 
 import java.lang.invoke.{MethodHandle, VarHandle}
