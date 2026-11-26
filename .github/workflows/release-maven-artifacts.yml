@@ -100,3 +100,4 @@ jobs:
           SONATYPE_PW   : ${{ secrets.MAVEN_REPOSITORY_TOKEN }}
           PGP_PW        : ${{ secrets.PGP_PW }}
           PGP_SECRET    : ${{ secrets.PGP_SECRET }}
+          SCALA_PGP_FINGERPRINT: ${{ vars.SCALA_PGP_FINGERPRINT }}
