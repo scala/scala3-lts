@@ -283,6 +283,8 @@ object Build {
     useSuperShell := false,
 
     PgpKeys.pgpPassphrase := sys.env.get("PGP_PW").map(_.toCharArray()),
+    // BouncyCastle signs with the primary key by default, but CI has only the signing subkey
+    PgpKeys.pgpSigningKey := sys.env.get("SCALA_PGP_FINGERPRINT").filter(_.nonEmpty),
     PgpKeys.useGpgPinentry := true,
 
     // Do not cut off the bottom of large stack traces (default is 1024)
