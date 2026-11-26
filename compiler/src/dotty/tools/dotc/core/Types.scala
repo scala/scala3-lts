@@ -2934,6 +2934,7 @@ object Types extends TypeUtils {
     override def iso(that: Any, bs: BinderPairs): Boolean = that match {
       case that: NamedType =>
         designator.equals(that.designator) &&
+        isTerm == that.isTerm &&
         prefix.equals(that.prefix, bs)
       case _ =>
         false
