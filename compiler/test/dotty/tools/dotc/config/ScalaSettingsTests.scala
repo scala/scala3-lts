@@ -168,11 +168,11 @@ class ScalaSettingsTests:
   @Test def `Aliases of deprecated options are correctly mapped to their replacements`: Unit =
     val settings = ScalaSettings
     val tests = List(
-      settings.YtermConflict          -> settings.XtermConflict :* "package",
+      settings.YtermConflict          -> settings.XtermConflict :* ":package",
       settings.YnoGenericSig          -> settings.XnoGenericSig,
-      settings.Ydumpclasses           -> settings.Xdumpclasses :* "./",
-      settings.YjarCompressionLevel   -> settings.XjarCompressionLevel :* "0",
-      settings.YkindProjector         -> settings.XkindProjector :* "underscores",
+      settings.Ydumpclasses           -> settings.Xdumpclasses :* ":./",
+      settings.YjarCompressionLevel   -> settings.XjarCompressionLevel :* ":0",
+      settings.YkindProjector         -> settings.XkindProjector :* ":underscores",
       settings.YdropComments          -> settings.XdropComments,
       settings.YcookComments          -> settings.XcookComments,
       settings.YreadComments          -> settings.XreadComments,
